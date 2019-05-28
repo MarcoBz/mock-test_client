@@ -16,7 +16,7 @@
     </div>
     <DragAndDrop @changedFile="hideButtonCreate"  @parsedCsv="passFileData"  @parsedPDF="passPDFData" @parsedJson="passJsonData" v-if="!created" ref="dragAndDropComp"/>
     <div id = "main">
-      <router-view  @refreshAll="clear" v-if="created"/>
+      <router-view  @refreshAll="clear" v-if="created" />
     </div>
     <div id = "footer">
       <div class="row justify-content-md-center">

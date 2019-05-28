@@ -5,8 +5,13 @@
         <tr>
           <th scope="col">#</th>
           <th scope="col">Question</th>
-          <th scope="col">Answer</th>
-          <th scope="col">Correct Answer</th>
+          <th scope="col">
+            <div class="row text text-right"> Answers </div>
+            <div class="row">
+              <div class="col col-md-1" v-for= "i in currentPointersArray">{{i}}</div>
+            </div>
+          </th> 
+          <!-- <th scope="col">Correct Answer</th> -->
           <th scope="col" class="text text-left">String</th>
         </tr>
       </thead>
@@ -14,58 +19,89 @@
         <tr v-for = "row in rows">
           <th scope="row">{{row.numRow}}</th>
           <td><button class  ="btn" v-on:click="questionButton(row.numRow)" v-bind:class= "{'btn-success' : row.isQuestion}" ></button></td>
-          <td><button class  ="btn" v-on:click="answerButton(row.numRow)" v-bind:class= "{'btn-info' : row.isAnswer}"></button></td>
-          <td><button class  ="btn" v-on:click="correctAnswerButton(row.numRow)" v-bind:class= "{'btn-danger' : row.isCorrect}"></button></td>
+          <td>
+            <div class="row">
+              <div class="col col-md-1"v-for= "i in currentPointersArray"><button class  ="btn" v-on:click="answerButton(row.numRow, i)" v-bind:class= "row.pointer === i ? 'btn-info' : ''"></button></div>
+            </div>
+          </td>
+          <!-- <td><button class  ="btn" v-on:click="correctAnswerButton(row.numRow)" v-bind:class= "{'btn-danger' : row.isCorrect}"></button></td> -->
           <td class="text text-left" v-bind:class= "{'text-success' : row.isQuestion, 'text-info' : row.isAnswer, 'text-danger' : row.isCorrect}">{{row.str}}</td>
         </tr>
       </tbody>
     </table>
-    <button class  ="btn" v-on:click="download" >Download</button>
+    <button class  ="btn" v-on:click="nextStep" >Next step</button>
     <div v-if="showModal">
-    <transition name="modal">
-      <div class="modal-mask">
-        <div class="modal-wrapper">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-body">
-                <div class="container-fluid">
-                  <div v-for="question in questions" >
-                    <div v-if="!question.correctAnswer">
-                      <div class="row justify-content-md-center">
-                        <div class="col col-lg-2 border">
+      <transition name="modal">
+        <div class="modal-mask">
+          <div class="modal-wrapper">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-body">
+                  <div class="container-fluid">
+                    <div v-for="question in questions" >
+                      <!-- <div v-if="!question.correctAnswer"> -->
+                        <div class="row justify-content-md-center">
+                          <div class="col col-lg-2 border">
+                          </div>
+                          <div class="col col-lg-10 border font-weight-bold">
+                            {{question.question}}
+                          </div>
                         </div>
-                        <div class="col col-lg-10 border font-weight-bold">
-                          {{question.question}}
+                        <div class="row justify-content-md-center" v-for="answer in question.answers">
+                          <div class="col col-lg-2 border">
+                            <button class  ="btn" v-on:click="correctAnswerButton(question.numQuestion, answer.numAnswer)" v-bind:class= "{'btn-danger' : answer.isCorrect}"></button>
+                          </div>
+                          <div class="col col-lg-10 border text text-left" v-bind:class= "{'text-danger' : answer.isCorrect}" >
+                            {{answer.str}}
+                          </div>
                         </div>
-                      </div>
-                      <div class="row justify-content-md-center" v-for="answer in question.answers">
-                        <div class="col col-lg-2 border">
-                          <button class  ="btn" v-on:click="correctAnswerButton(answer.numRow)" v-bind:class= "{'btn-danger' : rows.find(c => c.numRow === answer.numRow).isCorrect}"></button>
-                        </div>
-                        <div class="col col-lg-10 border text text-left" v-bind:class= "{'text-danger' : rows.find(c => c.numRow === answer.numRow).isCorrect}" >
-                          {{answer.str}}
-                        </div>
-                      </div>
+                      <!-- </div> -->
                     </div>
+                  </div>  
+                </div>
+                <div class="modal-footer">
+                  <div class="row justify-content-md-center">
+                    <div class="col col-lg-4"><button type="button" class="btn" v-on:click= "back"> Back </button></div>
+                    <div class="col col-lg-4">
+                      <button type="button" class="btn" v-on:click= "download"> Download </button>
+                    </div>
+                    <div class="col col-lg-4"></div>
+                    
                   </div>
-                </div>  
-              </div>
-              <div class="modal-footer">
-                <div class="row justify-content-md-center">
-                  <div class="col col-lg-4"></div>
-                  <div class="col col-lg-4">
-                    <button type="button" class="btn" v-on:click="showModal = false"> Ok </button>
-                  </div>
-                  <div class="col col-lg-4"></div>
-                  
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </transition>
-  </div>
+      </transition>
+    </div>
+    <div v-if="showNumberModal" >
+      <transition name="modal">
+        <div class="modal-mask">
+          <div class="modal-wrapper">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container-fluid">
+                      <div class="row justify-content-md-center">
+                        <div class="col">
+                          Number of answers per question
+                        </div>
+                      </div>
+                      <div class="row justify-content-md-center">
+                        <div class="col"><input v-model="numberOfAnswers" type="text" placeholder="0" ></div>
+                      </div>
+                      <div class="row justify-content-md-center">
+                        <button type="button" class="btn" @click="goOn"> OK </button>
+                      </div>
+                    </div> 
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </div>
   </div>
 </template>
 
@@ -79,12 +115,18 @@ export default {
       rows : [],
       questions: [],
       pointersArray: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
-      showModal: false
+      showModal: false,
+      numberOfAnswers: 0,
+      showNumberModal: false,
+      currentPointersArray: null
     }
   },
 
+  created(){
+    this.showNumberModal = true
+  },
+
   mounted(){
-  
     if (!this.allRows) {
       this.$emit('refresh')
     }
@@ -95,37 +137,51 @@ export default {
           numRow: i,
           isQuestion: false,
           isAnswer: false,
+          pointer: null,
           isCorrect: false,
-          showModal: false
+          showModal: false,
         })
       }
     }
   },
 
+
+
   methods: {
+
+    goOn(){
+     this.showNumberModal = false
+     this.currentPointersArray = this.pointersArray.slice(0, this.numberOfAnswers)
+    },
+
+    joinAnswers(answersArray){
+      let joinedAnswersArray = []
+      let numAnswer = 0
+      for (let i = 0; i < this.currentPointersArray.length; i++){
+        let currentPointer = this.currentPointersArray[i]
+        let toJoinAnswersArray = answersArray.filter((answer) => {
+          return answer.pointer == currentPointer
+        })
+        toJoinAnswersArray = toJoinAnswersArray.map((answer) => {
+          return answer.str
+        })
+        joinedAnswersArray.push({
+          numAnswer: numAnswer,
+          str: toJoinAnswersArray.join(" "),
+          pointer: currentPointer,
+          isCorrect: false
+        })
+        numAnswer += 1
+      }
+      return joinedAnswersArray
+    },
 
     createQuestionsArray(){
       let questionStr = ""
       let answersArray = []
-      let correctAnswer = ""
-
-  //     let shuffled = this.shuffle(this.rows)
-  // //100 questions
-  //     let number = 250
-  //     for (let i = 0; i < number * 5; i++){
-  //       this.questions.push({
-  //           question: shuffled[i].str,
-  //           answers: [
-  //             shuffled[i+1].str,
-  //             shuffled[i+2].str,
-  //             shuffled[i+3].str,
-  //             shuffled[i+4].str
-  //           ],
-  //           correct: this.pointersArray[parseInt(Math.random() * 4)] 
-  //       })
-  //       i += 4
-  //     }
-
+      // let correctAnswer = ""
+      let joinedAnswersArray = []
+      let numQuestion = 0
       for (let i = 0; i < this.allRows.length; i++){
         if (this.rows.find(c => c.numRow === i).isQuestion){
           questionStr = this.rows.find(c => c.numRow === i).str
@@ -133,21 +189,27 @@ export default {
         else if (this.rows.find(c => c.numRow === i).isAnswer){
           answersArray.push({
             str: this.rows.find(c => c.numRow === i).str,
-            numRow: i
+            numRow: i,
+            pointer: this.rows.find(c => c.numRow === i).pointer
           })
-          if (this.rows.find(c => c.numRow === i).isCorrect){
+          // if (this.rows.find(c => c.numRow === i).isCorrect){
             
-            correctAnswer = this.rows.find(c => c.numRow === i).str
-          }
+          //   correctAnswer = this.rows.find(c => c.numRow === i).str
+          // }
         }
         if(( i+1 == this.allRows.length || this.rows.find(c => c.numRow === i+1).isQuestion) && questionStr  != ""){
+          joinedAnswersArray = this.joinAnswers(answersArray)
           this.questions.push({
+            numQuestion: numQuestion,
             question: questionStr,
-            answers: answersArray,
-            correctAnswer: this.pointersArray[answersArray.indexOf(answersArray.find(c => c.str == correctAnswer))]
+            answers: joinedAnswersArray,
+            // correctAnswer: this.pointersArray[answersArray.indexOf(joinedAnswersArray.find(c => c.str == correctAnswer))]
+            correctAnswer: null
           })  
           answersArray = []
-          correctAnswer = ""        
+          joinedAnswersArray = []
+          numQuestion += 1
+          // correctAnswer = ""        
         }
       }
     },
@@ -209,36 +271,91 @@ export default {
     },
 
     download(){
-      this.questions = []
-      this.createQuestionsArray()
       let checkAllCorrectAnswers = true
       for(let i = 0; i < this.questions.length; i++){
         if (!this.questions[i].correctAnswer) checkAllCorrectAnswers = false
       }
-
-
       if (checkAllCorrectAnswers){
-        // this.csvFile()
         this.jsonFile()
-        this.$emit('refresh')        
+        this.$emit('refresh')  
+        this.showModal = false; 
+        document.getElementById('body').className = ''
       }
-      else{
-        this.showModal = true
-      }
+    },
+
+    back(){
+      this.showModal = false; 
+      this.questions = []
+    },
+
+    nextStep(){
+      this.questions = []
+      this.createQuestionsArray()
+      this.showModal = true
+      document.getElementById("body").className = "modal-open"
+      // let checkAllCorrectAnswers = true
+      // for(let i = 0; i < this.questions.length; i++){
+      //   this.questions[i].numQuestion = i
+      //   if (!this.questions[i].correctAnswer) checkAllCorrectAnswers = false
+      // }
+
+
+      // if (checkAllCorrectAnswers){
+      //   // this.csvFile()
+      //   this.jsonFile()
+      //   this.$emit('refresh')        
+      // }
+      // else{
+      //   this.showModal = true
+      //   document.getElementById("body").className = "modal-open"
+      // }
 
     },
+    
     questionButton(numRow){
-      if (!this.rows.find(c => c.numRow === numRow).isQuestion) this.rows.find(c => c.numRow === numRow).isQuestion = true
+      if (!this.rows.find(c => c.numRow === numRow).isQuestion) {
+        this.rows.find(c => c.numRow === numRow).isQuestion = true
+        this.rows.find(c => c.numRow === numRow).isAnswer = false
+        this.rows.find(c => c.numRow === numRow).isCorrect = false
+        this.rows.find(c => c.numRow === numRow).pointer = null
+      }
       else this.rows.find(c => c.numRow === numRow).isQuestion = false
     },
-    answerButton(numRow){
-      if (!this.rows.find(c => c.numRow === numRow).isAnswer) this.rows.find(c => c.numRow === numRow).isAnswer = true
-      else this.rows.find(c => c.numRow === numRow).isAnswer = false
+
+    answerButton(numRow, pointer){
+      if (!this.rows.find(c => c.numRow === numRow).isAnswer){
+        this.rows.find(c => c.numRow === numRow).isAnswer = true
+        this.rows.find(c => c.numRow === numRow).isQuestion = false
+        this.rows.find(c => c.numRow === numRow).pointer = pointer
+      }
+      else if (this.rows.find(c => c.numRow === numRow).isAnswer && this.rows.find(c => c.numRow === numRow).pointer != pointer){
+        this.rows.find(c => c.numRow === numRow).pointer = pointer
+      }
+      else if (this.rows.find(c => c.numRow === numRow).isAnswer && this.rows.find(c => c.numRow === numRow).pointer == pointer){
+        this.rows.find(c => c.numRow === numRow).isAnswer = false
+        this.rows.find(c => c.numRow === numRow).isCorrect = false
+        this.rows.find(c => c.numRow === numRow).pointer = null
+      }
     },
-    correctAnswerButton(numRow){
-      if (!this.rows.find(c => c.numRow === numRow).isCorrect) this.rows.find(c => c.numRow === numRow).isCorrect = true
-      else this.rows.find(c => c.numRow === numRow).isCorrect = false
+    correctAnswerButton(numQuestion, numAnswer){
+      console.log(this.questions, numQuestion, numAnswer)
+      if(this.questions.find( c => c.numQuestion === numQuestion).answers.find( c=>c.numAnswer === numAnswer).isCorrect) {
+        this.questions.find( c => c.numQuestion === numQuestion).answers.find( c=>c.numAnswer === numAnswer).isCorrect = false
+        this.questions.find( c => c.numQuestion === numQuestion).correctAnswer = null
+      }
+      else {
+        if (this.questions.find( c => c.numQuestion === numQuestion).answers.find( c=>c.pointer === this.questions.find( c => c.numQuestion === numQuestion).correctAnswer)) this.questions.find( c => c.numQuestion === numQuestion).answers.find( c=>c.pointer === this.questions.find( c => c.numQuestion === numQuestion).correctAnswer).isCorrect = false
+        this.questions.find( c => c.numQuestion === numQuestion).answers.find( c=>c.numAnswer === numAnswer).isCorrect = true
+        this.questions.find( c => c.numQuestion === numQuestion).correctAnswer = this.questions.find( c => c.numQuestion === numQuestion).answers.find( c=>c.numAnswer === numAnswer).pointer
+      }
     }
+    // correctAnswerButton(numRow){
+    //   if (!this.rows.find(c => c.numRow === numRow).isCorrect) {
+    //     this.rows.find(c => c.numRow === numRow).isCorrect = true
+    //     this.rows.find(c => c.numRow === numRow).isQuestion = false
+    //   }
+    //   else this.rows.find(c => c.numRow === numRow).isCorrect = false
+    // }
   }
 }
 </script>
@@ -264,6 +381,7 @@ li {
 a {
   color: U42b983;
 }
+
 .modal-mask {
   position: fixed;
   z-index: 9998;
@@ -276,8 +394,18 @@ a {
   transition: opacity .3s ease;
 }
 
+.modal-open {
+    overflow-y: hidden;
+}
+
 .modal-wrapper {
   display: table-cell;
   vertical-align: middle;
+}
+
+.modal-body {
+  margin: 20px 0;
+  max-height: 800px;
+  overflow-y: auto;
 }
 </style>
