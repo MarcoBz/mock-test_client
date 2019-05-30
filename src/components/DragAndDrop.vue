@@ -11,12 +11,16 @@
           {{ files.name }}
         </div>
       </div>
-      <div class="row justify-content-md-center">
-        <input class="btn," type="file" id="file" ref="file" v-on:change="handleFileUpload()" style="display: none;"/>
-        <input type="button" class="btn" value="Get File" onclick="document.getElementById('file').click();" />
-      </div>
-      <div class="row justify-content-md-center">
-        <button class="btn" v-on:click="submitFiles()" v-show="files">Submit</button>
+      <div class="row">
+        <div class="col col-md-3"></div>
+        <div class="col col-md-3">
+          <input class="btn" type="file" id="file" ref="file" v-on:change="handleFileUpload()" style="display: none;"/>
+          <input type="button" class="btn margin-btn" value="Get File" onclick="document.getElementById('file').click();" />
+        </div>
+        <div class="col col-md-3">
+          <button class="btn margin-btn" v-on:click="submitFiles()" v-bind:disabled="!files">Submit</button>
+        </div>
+        <div class="col col-md-3"></div>
       </div>
     </div>
   </div>
@@ -102,25 +106,16 @@
 
 
 <style>
-  div.file-listing{
-    width: 400px;
-    margin: auto;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-  }
 
-  div.file-listing img{
-    height: 100px;
-  }
   form{
     display: block;
-    height: 400px;
-    width: 400px;
+    height: 200px;
+    width: 200px;
     background: #ccc;
     margin: auto;
     margin-top: 40px;
     text-align: center;
-    line-height: 400px;
+    line-height: 200px;
       border-radius: 4px;
   }
   button.submit-button{
@@ -134,5 +129,9 @@
     color: white;
     font-weight: bold;
     margin-top: 20px;
+  }
+
+  .margin-btn{
+    margin: 10px
   }
 </style>

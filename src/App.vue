@@ -1,136 +1,66 @@
 <template>
   <div id="app">
-    <div id = "header" class = "container">
-        <div class="row justify-content-md-center">
-          <div v-on:click="createMockTest" class="col" v-show="csvParsed"><button class="btn">Create Mock Test</button></div>
+    <header>
+      <!-- Fixed navbar -->
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <div class="navbar-brand"><u>Mock Test Creator</u></div>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#" v-bind:class= "{disabled : !user}">Quick Test</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" v-bind:class= "{disabled : !user}">Load Test</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" v-bind:class= "{disabled : !user}">Save Test</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" v-bind:class= "{disabled : !user}">Create Questions</a>
+            </li>
+          </ul>
         </div>
-        <div class="row justify-content-md-center">
-          <div v-on:click="createJsonFromCsv" class="col" v-show="csvParsed"><button class="btn">Create Json</button></div>
-        </div>
-        <div class="row justify-content-md-center">
-          <div v-on:click="createMockTest" class="col" v-show="jsonParsed"><button class="btn">Create Mock Test</button></div>
-        </div>
-        <div class="row justify-content-md-center">
-          <div v-on:click="createTable" class="col" v-show="pdfParsed"><button class="btn">Create Json</button></div>
-        </div>
-    </div>
-    <DragAndDrop @changedFile="hideButtonCreate"  @parsedCsv="passFileData"  @parsedPDF="passPDFData" @parsedJson="passJsonData" v-if="!created" ref="dragAndDropComp"/>
-    <div id = "main">
-      <router-view  @refreshAll="clear" v-if="created" />
-    </div>
-    <div id = "footer">
-      <div class="row justify-content-md-center">
-        <div id="clearButton" class="col col-6">
-          <button class="btn" v-on:click="clear">Clear</button>
+      </nav>
+    </header>
+    <main role="main" class="container">
+      <div class= "row">
+        <div class= "col col-md-12">
+          <!-- <Login @logged="getUser" v-if="!user"/> -->
+          <createQuestions  v-if="user" v-bind:user="user" />
         </div>
       </div>
-    </div>
+    </main>
+    <footer class="footer">
+      <div class="container">
+        <span class="text-muted">Powered by MarcoBz</span>
+      </div>
+    </footer>
   </div>
 </template>
 
 <script>
-import DragAndDrop from './components/DragAndDrop'
+import Login from './components/Login'
+import CreateQuestions from './components/CreateQuestions'
 import router from './router'
 export default {
   name: "App",
   components: {
-    DragAndDrop
+    Login,
+    CreateQuestions
   },
+
   data () {
     return {
-      created: false,
-      csvParsed: false,
-      allQuestions: null,
-      pdfParsed: false,
-      jsonParsed: false,
-      allRows: null
+     user: "marco_bz"
     }
   },
-
-  mounted(){
-    router.push({ path: '/'})
-  },
-
   methods: {
-
-    createJsonFromCsv(){
-      let json = []
-      for (let i = 0; i < this.allQuestions.length; i++){
-        let answerArray = []
-        for (let j = 0; j < this.allQuestions[i].answers.length; j++) {
-          answerArray.push(this.allQuestions[i].answers[j].answer)
-        }
-        json.push({
-          question: this.allQuestions[i].question,
-          answers: answerArray,
-          correctAnswer: this.allQuestions[i].correctAnswer
-        })
-      }
-      if (json != []){
-        var hiddenElement = document.createElement('a')
-        hiddenElement.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json))
-        let currentDate = new Date().toISOString()
-        hiddenElement.download = 'json_' + currentDate + '.json'
-        hiddenElement.click()
-      }
-      this.clear()
+    getUser(value){
+      this.user = value
     },
-
-    createMockTest(){
-      this.created = true
-      this.csvParsed = false
-      this.jsonParsed = false
-      router.push({ name: 'MockTestPage', params: {allQuestions: this.allQuestions}})
-    },   
-    createTable(){
-      this.created = true
-      this.pdfParsed = false
-      router.push({ name: 'Table', params: {allRows: this.allRows}})
-    }, 
-    
-    clear(){
-      if(this.$refs.dragAndDropComp) this.$refs.dragAndDropComp.clear()
-      this.created= false
-      this.csvParsed= false
-      this.allQuestions= null
-      this.pdfParsed= false
-      this.jsonParsed= false
-      this.allRows= null
-      router.push({ path : '/'})
-    },
-
-    passFileData(value){
-      this.allRows = null
-      this.pdfParsed = false
-      this.jsonParsed = false
-      this.allQuestions = value
-      this.csvParsed = true
-    },
-
-    passPDFData(value){
-      this.allQuestions = null
-      this.csvParsed = false
-      this.jsonParsed = false
-      this.allRows = value
-      this.pdfParsed = true
-    },
-    
-    passJsonData(value){
-      this.allRows = null
-      this.csvParsed = false
-      this.pdfParsed = false
-      this.allQuestions = value
-      this.jsonParsed = true
-    },
-
-    hideButtonCreate(){
-      this.csvParsed = false
-      this.pdfParsed = false
-      this.allQuestions = null
-      this.allRows = null  
-      this.jsonParsed = false   
-    }
-
   }
 
 }
@@ -144,5 +74,14 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    line-height: 60px;
+    background-color: #f5f5f5;
 }
 </style>
