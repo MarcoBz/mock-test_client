@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import MockTestPage from '../components/MockTestPage'
 // import Results from '../components/Results'
-import Table from '../components/Table'
+// import Table from '../components/Table'
 
 Vue.use(Router)
 
@@ -25,11 +25,11 @@ export default new Router({
       //   }
       // ]
     },
-    {
-      path: '/Table',
-      name: 'Table',      
-      component: Table,
-      props: true
-    }
+    // {
+    //   path: '/Table',
+    //   name: 'Table',      
+    //   component: Table,
+    //   props: true
+    // }
   ]
 })

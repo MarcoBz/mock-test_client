@@ -10,7 +10,7 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-              <a class="nav-link" href="#" v-bind:class= "{disabled : !user}">Quick Test</a>
+              <a class="nav-link" href="#" v-bind:class= "{disabled : !user}" >Quick Test</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#" v-bind:class= "{disabled : !user}">Load Test</a>
@@ -19,23 +19,24 @@
               <a class="nav-link" href="#" v-bind:class= "{disabled : !user}">Save Test</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#" v-bind:class= "{disabled : !user}">Create Questions</a>
+              <a class="nav-link" href="#" v-bind:class= "{disabled : !user}" @click="createQuestionsFunction">Create Questions</a>
             </li>
           </ul>
         </div>
       </nav>
     </header>
-    <main role="main" class="container">
+    <main role="main" class="container main">
       <div class= "row">
         <div class= "col col-md-12">
           <!-- <Login @logged="getUser" v-if="!user"/> -->
-          <createQuestions  v-if="user" v-bind:user="user" />
+          <createQuestions  v-if="user && components.createQuestions" v-bind:user="user" @createQuestions= "createTable"/>
+          <createTable  v-if="user && components.createTable" v-bind:user="user" v-bind:allRows="allRows" />
         </div>
       </div>
     </main>
-    <footer class="footer">
-      <div class="container">
-        <span class="text-muted">Powered by MarcoBz</span>
+    <footer class="fixed-bottom">
+      <div class="container-fluid footer">
+        <span class="text-muted text-center">Powered by MarcoBz</span>
       </div>
     </footer>
   </div>
@@ -44,23 +45,55 @@
 <script>
 import Login from './components/Login'
 import CreateQuestions from './components/CreateQuestions'
-import router from './router'
+import CreateTable from './components/CreateTable'
 export default {
   name: "App",
   components: {
     Login,
-    CreateQuestions
+    CreateQuestions,
+    CreateTable
   },
 
   data () {
     return {
-     user: "marco_bz"
+     user: "marco_bz",
+     modules: [],
+     test: null,
+     allRows: null,
+     components: {
+        createQuestions: true,
+        login: false,
+        createTable: false
+     }
     }
   },
   methods: {
     getUser(value){
       this.user = value
     },
+
+    createQuestionsFunction(){
+      this.components = {
+        createQuestions: true,
+        login: false,
+        createTable: false
+      } 
+      this.test = null
+      this.modules = []
+      this.allRows = null
+    },
+
+    createTable(value){
+      this.test = value.test
+      this.modules = value.modules
+      this.allRows = value.rows
+      this.components = {
+        createQuestions: false,
+        login: false,
+        createTable: true
+      }
+    }
+
   }
 
 }
@@ -84,4 +117,9 @@ export default {
     line-height: 60px;
     background-color: #f5f5f5;
 }
+
+.main{
+  margin-bottom: 60px;
+}
+
 </style>

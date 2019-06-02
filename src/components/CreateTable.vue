@@ -29,7 +29,7 @@
         </tr>
       </tbody>
     </table>
-    <button class  ="btn" v-on:click="nextStep" >Next step</button>
+    <button class  ="btn margin-btn" v-on:click="nextStep" >Next step</button>
     <div v-if="showModal">
       <transition name="modal">
         <div class="modal-mask">
@@ -106,10 +106,9 @@
 </template>
 
 <script>
-import router from '../router'
 export default {
-  name: 'Table',
-  props: ["allRows"],
+  name: 'CreateTable',
+  props: ["user","allRows"],
   data () {
     return {
       rows : [],
@@ -123,12 +122,13 @@ export default {
   },
 
   created(){
+    console.log('test')
     this.showNumberModal = true
   },
 
   mounted(){
     if (!this.allRows) {
-      this.$emit('refresh')
+      // this.$emit('refresh')
     }
     else {    
       for (let i = 0; i < this.allRows.length; i++){
@@ -338,7 +338,6 @@ export default {
       }
     },
     correctAnswerButton(numQuestion, numAnswer){
-      console.log(this.questions, numQuestion, numAnswer)
       if(this.questions.find( c => c.numQuestion === numQuestion).answers.find( c=>c.numAnswer === numAnswer).isCorrect) {
         this.questions.find( c => c.numQuestion === numQuestion).answers.find( c=>c.numAnswer === numAnswer).isCorrect = false
         this.questions.find( c => c.numQuestion === numQuestion).correctAnswer = null
@@ -408,4 +407,10 @@ a {
   max-height: 800px;
   overflow-y: auto;
 }
+
+
+.margin-btn{
+  margin: 10px
+}
+
 </style>

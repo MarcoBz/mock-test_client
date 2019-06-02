@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col col-12">
         <!-- <DragAndDrop v-bind:disabled= "pdfParsed" @changedFile="changedFileFunction"  @parsedCsv="passFileData"  @parsedPDF="parsedPDFFunction" @parsedJson="passJsonData" ref="dragAndDropComp"/> -->
-        <DragAndDrop @parsedPDF="parsedPDFFunction"/>
+        <DragAndDrop @parsedPDF="parsedPDFFunction" @changedFile="clear"/>
       </div>
     </div>
     <div class="row justify-content-md-center">
@@ -80,14 +80,23 @@
     },
     methods: {
 
+      clear(){
+        this.allRows = null
+        this.pdfParsed= false
+        this.tests= []
+        this.modules= []
+        this.chosenTestName= null
+        this.chosenModulesName= ['general']
+      },
+
       createQuestions(){
         this.showModal = false
         let value = {
           test: this.chosenTestName,
           modules: this.chosenModulesName,
-          rows: allRows
+          rows: this.allRows
         }
-        ths.$emit('createQuestions', value)
+        this.$emit('createQuestions', value)
       },
 
       clearTestName(){
@@ -139,7 +148,7 @@
           if (response.data.content) {
             for (let i = 0; i < response.data.content.length; i++){
 
-              if (response.data.content[i].moduleName == "general") this.modules.push({
+              if (response.data.content[i].moduleName != "general") this.modules.push({
                 moduleName: response.data.content[i].moduleName,
                 createdDate: response.data.content[i].createdDate,
                 isClicked: false
