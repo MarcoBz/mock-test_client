@@ -29,8 +29,8 @@
       <div class= "row">
         <div class= "col col-md-12">
           <!-- <Login @logged="getUser" v-if="!user"/> -->
-          <createQuestions  v-if="user && components.createQuestions" v-bind:user="user" @createQuestions= "createTable"/>
-          <createTable  v-if="user && components.createTable" v-bind:user="user" v-bind:allRows="allRows" />
+          <createQuestions  v-if="user && components.createQuestions" v-bind:user="user" @createQuestions= "createTable" ref="dragAndDropComp"/>
+          <createTable  v-if="user && components.createTable" v-bind:user="user" v-bind:allRows="allRows" v-bind:testName="testName" v-bind:modules="modules" @refresh="clear"/>
         </div>
       </div>
     </main>
@@ -56,18 +56,31 @@ export default {
 
   data () {
     return {
-     user: "marco_bz",
-     modules: [],
-     test: null,
-     allRows: null,
-     components: {
+      user: "marco_bz",
+      allRows: null,
+      components: {
         createQuestions: true,
         login: false,
         createTable: false
-     }
+      },
+      testName: null,
+      modules: []
     }
   },
   methods: {
+
+    clear(){
+      if(this.$refs.dragAndDropComp) this.$refs.dragAndDropComp.clear()
+      this.modules= []
+      this.testName= null
+      this.allRows= null
+      this.components= {
+        createQuestions: true,
+        login: false,
+        createTable: false
+      }
+    },
+
     getUser(value){
       this.user = value
     },
@@ -78,13 +91,13 @@ export default {
         login: false,
         createTable: false
       } 
-      this.test = null
+      this.testName = null
       this.modules = []
       this.allRows = null
     },
 
     createTable(value){
-      this.test = value.test
+      this.testName = value.test
       this.modules = value.modules
       this.allRows = value.rows
       this.components = {

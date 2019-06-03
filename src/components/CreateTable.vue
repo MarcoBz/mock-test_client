@@ -11,7 +11,6 @@
               <div class="col col-md-1" v-for= "i in currentPointersArray">{{i}}</div>
             </div>
           </th> 
-          <!-- <th scope="col">Correct Answer</th> -->
           <th scope="col" class="text text-left">String</th>
         </tr>
       </thead>
@@ -24,12 +23,11 @@
               <div class="col col-md-1"v-for= "i in currentPointersArray"><button class  ="btn" v-on:click="answerButton(row.numRow, i)" v-bind:class= "row.pointer === i ? 'btn-info' : ''"></button></div>
             </div>
           </td>
-          <!-- <td><button class  ="btn" v-on:click="correctAnswerButton(row.numRow)" v-bind:class= "{'btn-danger' : row.isCorrect}"></button></td> -->
           <td class="text text-left" v-bind:class= "{'text-success' : row.isQuestion, 'text-info' : row.isAnswer, 'text-danger' : row.isCorrect}">{{row.str}}</td>
         </tr>
       </tbody>
     </table>
-    <button class  ="btn margin-btn" v-on:click="nextStep" >Next step</button>
+    <button class  ="btn margin-btn" v-on:click="goToDefineCorrectAnswers" >Define correct answers</button>
     <div v-if="showModal">
       <transition name="modal">
         <div class="modal-mask">
@@ -57,17 +55,21 @@
                         </div>
                       <!-- </div> -->
                     </div>
-                  </div>  
-                </div>
-                <div class="modal-footer">
-                  <div class="row justify-content-md-center">
-                    <div class="col col-lg-4"><button type="button" class="btn" v-on:click= "back"> Back </button></div>
-                    <div class="col col-lg-4">
-                      <button type="button" class="btn" v-on:click= "download"> Download </button>
+                    <div class="row justify-content-md-center">
+                      <div class="col col-md-4">
+                        <button type="button" class="btn" v-on:click= "download" v-bind:disabled="!checkAllCorrectAnswers"> Download </button>
+                      </div>
+                      <div class="col col-md-4">
+                        <button type="button" class="btn" v-on:click= "save" v-bind:disabled="!checkAllCorrectAnswers"> Save </button>
+                      </div>
+                      <div class="col col-md-4">
+                        <button type="button" class="btn" v-on:click= "downloadAndSave" v-bind:disabled="!checkAllCorrectAnswers"> Download and Save</button>
+                      </div>
                     </div>
-                    <div class="col col-lg-4"></div>
-                    
-                  </div>
+                    <div class="row justify-content-md-center">
+                      <div class="col col-md"><button type="button" class="btn" v-on:click= "back"> Back </button></div>
+                    </div>
+                  </div>  
                 </div>
               </div>
             </div>
@@ -92,7 +94,7 @@
                         <div class="col"><input v-model="numberOfAnswers" type="text" placeholder="0" ></div>
                       </div>
                       <div class="row justify-content-md-center">
-                        <button type="button" class="btn" @click="goOn"> OK </button>
+                        <button type="button" class="btn" @click="goToCreateQuestions"> OK </button>
                       </div>
                     </div> 
                 </div>
@@ -106,9 +108,10 @@
 </template>
 
 <script>
+import userService from '../../services/userService'
 export default {
   name: 'CreateTable',
-  props: ["user","allRows"],
+  props: ["user","allRows", "testName", "modules"],
   data () {
     return {
       rows : [],
@@ -117,12 +120,12 @@ export default {
       showModal: false,
       numberOfAnswers: 0,
       showNumberModal: false,
-      currentPointersArray: null
+      currentPointersArray: null,
+      checkAllCorrectAnswers: false
     }
   },
 
   created(){
-    console.log('test')
     this.showNumberModal = true
   },
 
@@ -149,7 +152,7 @@ export default {
 
   methods: {
 
-    goOn(){
+    goToCreateQuestions(){
      this.showNumberModal = false
      this.currentPointersArray = this.pointersArray.slice(0, this.numberOfAnswers)
     },
@@ -179,7 +182,6 @@ export default {
     createQuestionsArray(){
       let questionStr = ""
       let answersArray = []
-      // let correctAnswer = ""
       let joinedAnswersArray = []
       let numQuestion = 0
       for (let i = 0; i < this.allRows.length; i++){
@@ -192,10 +194,6 @@ export default {
             numRow: i,
             pointer: this.rows.find(c => c.numRow === i).pointer
           })
-          // if (this.rows.find(c => c.numRow === i).isCorrect){
-            
-          //   correctAnswer = this.rows.find(c => c.numRow === i).str
-          // }
         }
         if(( i+1 == this.allRows.length || this.rows.find(c => c.numRow === i+1).isQuestion) && questionStr  != ""){
           joinedAnswersArray = this.joinAnswers(answersArray)
@@ -203,13 +201,11 @@ export default {
             numQuestion: numQuestion,
             question: questionStr,
             answers: joinedAnswersArray,
-            // correctAnswer: this.pointersArray[answersArray.indexOf(joinedAnswersArray.find(c => c.str == correctAnswer))]
             correctAnswer: null
           })  
           answersArray = []
           joinedAnswersArray = []
-          numQuestion += 1
-          // correctAnswer = ""        
+          numQuestion += 1  
         }
       }
     },
@@ -233,24 +229,7 @@ export default {
       return array;
     },
 
-    csvFile(){
-      let csv = ""
-      for (let i = 0; i < this.questions.length; i++){
-        let answerArray = []
-        for (let j = 0; j < this.questions[i].answers.length; j++) answerArray.push(this.questions[i].answers[j].str)
-        csv += this.questions[i].question + "$" + answerArray.join("$") + "$" + this.questions[i].correctAnswer
-        if ( i + 1 != this.questions.length) csv += "\n"
-      }
-      if (csv != ""){
-        var hiddenElement = document.createElement('a')
-        hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv)
-        let currentDate = new Date().toISOString()
-        hiddenElement.download = 'csv_' + currentDate + '.csv'
-        hiddenElement.click()
-        }
-    },
-
-    jsonFile(){
+    downloadJsonFile(){
       let json = []
       for (let i = 0; i < this.questions.length; i++){
         let answerArray = []
@@ -270,13 +249,47 @@ export default {
       }
     },
 
-    download(){
-      let checkAllCorrectAnswers = true
-      for(let i = 0; i < this.questions.length; i++){
-        if (!this.questions[i].correctAnswer) checkAllCorrectAnswers = false
+    async save(){
+      if (this.checkAllCorrectAnswers){
+        let response
+        try{
+          let op = "add"
+          let path = "/questions"
+          let value = []
+          for (let i = 0; i < this.questions.length; i++){
+            let answerArray = []
+            for (let j = 0; j < this.questions[i].answers.length; j++) answerArray.push(this.questions[i].answers[j].str)
+            value.push({
+              question: this.questions[i].question,
+              answers: answerArray,
+              correctAnswer: this.questions[i].correctAnswer,
+              testName: this.testName,
+              modules: this.modules
+            })
+          }
+          response = await userService.patchTest(this.user, this.testName, op, path, value)
+        }
+        catch (err){
+          response = err.response
+        }
+        finally {
+          if (response.data.content) {
+            this.$emit('refresh')  
+            this.showModal = false; 
+            document.getElementById('body').className = ''
+          }
+        }
       }
-      if (checkAllCorrectAnswers){
-        this.jsonFile()
+    },
+
+    downloadAndSave(){
+      if (this.checkAllCorrectAnswers) this.downloadJsonFile()
+      this.save()
+    },
+
+    download(){
+      if (this.checkAllCorrectAnswers){
+        this.downloadJsonFile()
         this.$emit('refresh')  
         this.showModal = false; 
         document.getElementById('body').className = ''
@@ -288,28 +301,11 @@ export default {
       this.questions = []
     },
 
-    nextStep(){
+    goToDefineCorrectAnswers(){
       this.questions = []
       this.createQuestionsArray()
       this.showModal = true
       document.getElementById("body").className = "modal-open"
-      // let checkAllCorrectAnswers = true
-      // for(let i = 0; i < this.questions.length; i++){
-      //   this.questions[i].numQuestion = i
-      //   if (!this.questions[i].correctAnswer) checkAllCorrectAnswers = false
-      // }
-
-
-      // if (checkAllCorrectAnswers){
-      //   // this.csvFile()
-      //   this.jsonFile()
-      //   this.$emit('refresh')        
-      // }
-      // else{
-      //   this.showModal = true
-      //   document.getElementById("body").className = "modal-open"
-      // }
-
     },
     
     questionButton(numRow){
@@ -347,14 +343,15 @@ export default {
         this.questions.find( c => c.numQuestion === numQuestion).answers.find( c=>c.numAnswer === numAnswer).isCorrect = true
         this.questions.find( c => c.numQuestion === numQuestion).correctAnswer = this.questions.find( c => c.numQuestion === numQuestion).answers.find( c=>c.numAnswer === numAnswer).pointer
       }
+
+      let checkAllCorrectAnswers = true
+      for(let i = 0; i < this.questions.length; i++){
+        if (!this.questions[i].correctAnswer) checkAllCorrectAnswers = false
+      }
+      if (checkAllCorrectAnswers === true) this.checkAllCorrectAnswers = true
+      else this.checkAllCorrectAnswers = false
+
     }
-    // correctAnswerButton(numRow){
-    //   if (!this.rows.find(c => c.numRow === numRow).isCorrect) {
-    //     this.rows.find(c => c.numRow === numRow).isCorrect = true
-    //     this.rows.find(c => c.numRow === numRow).isQuestion = false
-    //   }
-    //   else this.rows.find(c => c.numRow === numRow).isCorrect = false
-    // }
   }
 }
 </script>
