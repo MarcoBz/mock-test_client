@@ -1,21 +1,26 @@
 <template>
   <div id="test">
       <div class="row justify-content-md-center" v-for="(question, index) in questions" v-if="showTest">
-        <div class="coloredCol col col-sm-1 border" v-bind:class="[colorClass[index]]"></div>
-        <div class="questionCol col col-sm-5 border">{{question.question}}</div>
-        <div class="answersCol col col-sm-5 border">
-          <div class="form-check" v-for="answer in question.answers">
-            <label>
-              <input class="form-check-input" :name="index" :value="answer.pointer" type="radio" :disabled="showCorrectAnswers" v-model="question.givenAnswer">
-              <span>{{answer.pointer}}- {{answer.answer}}</span>
-            </label>
+        <div class="col col-12">
+          <div class="row">
+            <div class="coloredCol col col-sm-1 border" v-bind:class="[colorClass[index]]"></div>
+            <div class="questionCol col col-sm-10 border">{{question.question}}</div>
+            <div class="resultCol col col-sm-1 border font-weight-bold">
+              <div v-show="showCorrectAnswers">{{question.correctAnswer}}</div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="answersCol col col-sm-12 border">
+              <div class="form-check" v-for="answer in question.answers">
+                <label>
+                  <input class="form-check-input" :name="index" :value="answer.pointer" type="radio" :disabled="showCorrectAnswers" v-model="question.givenAnswer">
+                  <span>{{answer.pointer}}- {{answer.answer}}</span>
+                </label>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="resultCol col col-sm-1 border">
-          <div v-show="showCorrectAnswers">{{question.correctAnswer}}</div>
-        </div>
       </div>
-
       <div class="row justify-content-md-center">
         <div class="col col-sm-3">
           <button class="btn" v-on:click="getResults">Get Results</button>
@@ -30,7 +35,6 @@
           <button class="btn" v-on:click="refresh">Refresh</button>
         </div>
       </div>
-      <Results v-if="showResults" v-bind:parameters = "parameters" v-bind:questions = "questions" ref="Results"/>
       <div v-if="showModal">
         <transition name="modal">
           <div class="modal-mask">
@@ -72,21 +76,16 @@
 </template>
 
 <script>
-import router from '../router'
-import Results from './Results'
 export default {
   name: 'Test',
-  components: {
-    Results
-  },
-  props: ["allQuestions", "parameters"],
+  props: ["allQuestions", "testSettings"],
   data () {
     return {
       colorClass:[],
       shuffledQuestions: [],
       questions: [],
       showCorrectAnswers: false,
-      nQuestions: this.parameters.nQuestions,
+      numbersOfQuestions: this.testSettings.numbersOfQuestions,
       showResults: false,
       showModal: false,
       test: null,
@@ -147,7 +146,7 @@ export default {
     },
     
     getQuestions(){
-      for ( let i = 0; i < this.nQuestions; i++){
+      for ( let i = 0; i < this.numbersOfQuestions; i++){
         let chosenQuestion = this.shuffledQuestions.pop()
         this.questions.push({
           question: chosenQuestion.question,
@@ -160,7 +159,7 @@ export default {
     },
 
     getResults(){
-      // router.push({ name: 'Results', params: {questions: this. questions, nQuestions: this.nQuestions, correctAnswersPoints: this.correctAnswersPoints, noAnswersPoints: this.noAnswersPoints, wrongAnswersPoints: this.wrongAnswersPoints}})
+      // router.push({ name: 'Results', params: {questions: this. questions, numbersOfQuestions: this.numbersOfQuestions, correctAnswersPoints: this.correctAnswersPoints, noAnswersPoints: this.noAnswersPoints, wrongAnswersPoints: this.wrongAnswersPoints}})
       this.showCorrectAnswers = true
       for(let i = 0; i < this.questions.length; i++){
         if (!this.questions[i].givenAnswer) {
@@ -169,13 +168,19 @@ export default {
         else if (this.questions[i].givenAnswer == this.questions[i].correctAnswer) this.colorClass.push("background bg-success")
         else this.colorClass.push("background bg-danger")     
       }
-      this.showResults = true
+      let value = {
+
+        questions: this.questions,
+        gotResults: true
+
+      }
+      this.$emit('updateResults', value)
     },
 
     refresh(){
       window.scrollTo(0,0)
       this.clear()
-      this.nQuestions = this.parameters.nQuestions
+      this.numbersOfQuestions = this.testSettings.numbersOfQuestions
       this.prepareQuestions()
       this.getQuestions()
       this.showTest= true
@@ -184,7 +189,13 @@ export default {
     restart(){
       window.scrollTo(0,0)
       if (this.$refs.Results) this.$refs.Results.clear()
-      this.showResults = false
+      let value = {
+
+        questions: null,
+        gotResults: false
+
+      }
+      this.$emit('updateResults', value)
       this.showCorrectAnswers = false,
       this.colorClass = []
 
@@ -199,7 +210,13 @@ export default {
     retry(){
       window.scrollTo(0,0)
       if (this.$refs.Results) this.$refs.Results.clear()
-      this.showResults = false
+      let value = {
+
+        questions: null,
+        gotResults: false
+
+      }
+      this.$emit('updateResults', value)
       this.showCorrectAnswers = false,
       this.colorClass = []
       let wrongQuestions = this.questions.filter((question) => {
@@ -251,12 +268,18 @@ export default {
     },
 
     clear(){
-      this.showResults = false
+      let value = {
+
+        questions: null,
+        gotResults: false
+
+      }
+      this.$emit('updateResults', value)
       this.questions = []
       this.showCorrectAnswers = false
       this.shuffledQuestions = []
       this.colorClass = []
-      this.nQuestions = null
+      this.numbersOfQuestions = null
       if (this.$refs.Results) this.$refs.Results.clear()
     }
 

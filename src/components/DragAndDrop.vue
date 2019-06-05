@@ -18,7 +18,7 @@
           <input type="button" class="btn margin-btn" value="Get File" onclick="document.getElementById('file').click();" />
         </div>
         <div class="col col-md-3">
-          <button class="btn margin-btn" v-on:click="submitFiles()" v-bind:disabled="!files">Submit</button>
+          <button class="btn margin-btn" v-on:click="submitFiles()" v-bind:disabled="!files" v-bind:class="{'btn-success' : isSubmitButtonClicked}">Submit</button>
         </div>
         <div class="col col-md-3"></div>
       </div>
@@ -35,7 +35,8 @@
     data () {
       return {
         dragAndDropCapable: false,
-        files: null
+        files: null,
+        isSubmitButtonClicked: false
       }
     },
 
@@ -51,6 +52,7 @@
           }.bind(this), false);
         }.bind(this));
         this.$refs.fileform.addEventListener('drop', function(e){
+          this.isSubmitButtonClicked = false
           this.$emit('changedFile')
           this.files= e.dataTransfer.files[0];
         }.bind(this));
@@ -60,6 +62,7 @@
     methods: {
 
       handleFileUpload(){
+        this.isSubmitButtonClicked = false
         this.files = this.$refs.file.files[0]
         this.$emit('changedFile')
       },
@@ -67,6 +70,7 @@
       clear(){
         this.dragAndDropCapable= false
         this.files= null
+        this.isSubmitButtonClicked = false
       },
 
       determineDragAndDropCapable(){
@@ -79,6 +83,7 @@
 
       submitFiles(){
         let extension = this.files.name.substring(this.files.name.lastIndexOf('.')+1, this.files.name.length) || this.name.files
+        this.isSubmitButtonClicked = true
         if (extension == "csv"){
           parseCsv.csvParsing(this.files)
           .then((allQuestions) => {

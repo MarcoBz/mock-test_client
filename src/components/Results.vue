@@ -1,10 +1,10 @@
 <template>
-  <div id="mocktest">
+  <div id="results">
     <div class = "container">
-      <div class="row justify-content-md-center text text-success font-weight-bold">Corrent Answers = {{correctAnswers}}/{{nQuestions}}</div>
-      <div class="row justify-content-md-center text text-danger font-weight-bold">Wrong Answers = {{wrongAnswers}}/{{nQuestions}}</div>
-      <div class="row justify-content-md-center text text-warning font-weight-bold">No Answers ={{noAnswers}}/{{nQuestions}}</div>
-      <div class="row justify-content-md-center text font-weight-bold">Total Points = {{totalPoints}}/{{nQuestions}}</div>
+      <div class="row justify-content-md-center text text-success font-weight-bold">Corrent Answers = {{correctAnswers}}/{{numbersOfQuestions}}</div>
+      <div class="row justify-content-md-center text text-danger font-weight-bold">Wrong Answers = {{wrongAnswers}}/{{numbersOfQuestions}}</div>
+      <div class="row justify-content-md-center text text-warning font-weight-bold">No Answers ={{noAnswers}}/{{numbersOfQuestions}}</div>
+      <div class="row justify-content-md-center text font-weight-bold">Total Points = {{totalPoints}}/{{numbersOfQuestions}}</div>
       <hr>
       <div class="row justify-content-md-center text font-weight-bold">Wrong or No answers</div>
       <div class="row justify-content-md-center text font-weight-bold">
@@ -33,13 +33,13 @@
 import router from '../router'
 export default {
   name: 'Results',
-  props: ["questions", "parameters"],
+  props: ["questions", "testSettings"],
   data () {
     return {
-      nQuestions: this.parameters.nQuestions,
-      correctAnswersPoints: this.parameters.correctAnswersPoints,
-      noAnswersPoints: this.parameters.noAnswersPoints,
-      wrongAnswersPoints: this.parameters.wrongAnswersPoints,
+      numbersOfQuestions: this.testSettings.numbersOfQuestions,
+      correctAnswersPoints: this.testSettings.correctAnswersPoints,
+      noAnswersPoints: this.testSettings.noAnswersPoints,
+      wrongAnswersPoints: this.testSettings.wrongAnswersPoints,
       correctAnswers: 0,
       wrongAnswers: 0,
       noAnswers: 0,
@@ -62,7 +62,7 @@ export default {
 
   methods:{
     clear(){
-      this.nQuestions = null
+      this.numbersOfQuestions = null
       this.correctAnswersPoints= null
       this.noAnswersPoints= null
       this.wrongAnswersPoints= null

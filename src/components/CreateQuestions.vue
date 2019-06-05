@@ -3,11 +3,11 @@
     <div class="row">
       <div class="col col-12">
         <!-- <DragAndDrop v-bind:disabled= "pdfParsed" @changedFile="changedFileFunction"  @parsedCsv="passFileData"  @parsedPDF="parsedPDFFunction" @parsedJson="passJsonData" ref="dragAndDropComp"/> -->
-        <DragAndDrop @parsedPDF="parsedPDFFunction" @changedFile="clear"/>
+        <DragAndDrop @parsedPDF="parsedPDFFunction" @changedFile="clear" ref="dragAndDropComp"/>
       </div>
     </div>
     <div class="row justify-content-md-center">
-      <div v-on:click="chooseTestName" class="col col-12" v-show="pdfParsed"><button class="btn">Choose Test</button></div>
+      <div v-on:click="chooseTestName" class="col col-12" v-show="pdfParsed" ><button class="btn">Choose Test</button></div>
     </div>
 
     <div v-if="showModal" >
@@ -79,6 +79,17 @@
       }
     },
     methods: {
+
+      clearAll(){
+        if(this.$refs.dragAndDropComp) this.$refs.dragAndDropComp.clear()
+        this.allRows = null
+        this.pdfParsed= false
+        this.tests= []
+        this.modules= []
+        this.chosenTestName= null
+        this.chosenModulesName= ['general']
+
+      },
 
       clear(){
         this.allRows = null

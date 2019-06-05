@@ -110,7 +110,7 @@
 <script>
 import userService from '../../services/userService'
 export default {
-  name: 'CreateTable',
+  name: 'ShowTable',
   props: ["user","allRows", "testName", "modules"],
   data () {
     return {
