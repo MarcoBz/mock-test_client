@@ -80,7 +80,6 @@
       }
       finally {
         if (response.data.content) {
-          this.showModal = true
           for (let i = 0; i < response.data.content.length; i++){
             this.tests.push({
               testName: response.data.content[i].testName,
@@ -101,7 +100,8 @@
           test: this.chosenTestName,
           modules: this.chosenModulesName,
           allQuestions: this.allQuestions,
-          testSettings: this.testSettings
+          testSettings: this.testSettings,
+          saveResults: true
 
         }
 

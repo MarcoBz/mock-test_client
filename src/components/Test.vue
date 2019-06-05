@@ -1,16 +1,16 @@
 <template>
   <div id="test">
-      <div class="row justify-content-md-center" v-for="(question, index) in questions" v-if="showTest">
+      <div class="row " v-for="(question, index) in questions" v-if="showTest">
         <div class="col col-12">
-          <div class="row">
-            <div class="coloredCol col col-sm-1 border" v-bind:class="[colorClass[index]]"></div>
-            <div class="questionCol col col-sm-10 border">{{question.question}}</div>
+          <div class="row question-row">
+            <!-- <div class="coloredCol col col-sm-1 border" v-bind:class="[colorClass[index]]"></div> -->
+            <div class="questionCol col col-sm-11 border font-weight-bold">{{question.question}}</div>
             <div class="resultCol col col-sm-1 border font-weight-bold">
-              <div v-show="showCorrectAnswers">{{question.correctAnswer}}</div>
+              <div class="coloredCol" v-bind:class="[colorClass[index]]" v-show="showCorrectAnswers">{{question.correctAnswer}}</div>
             </div>
           </div>
-          <div class="row">
-            <div class="answersCol col col-sm-12 border">
+          <div class="row  border">
+            <div class="answersCol col col-sm-12 text-left">
               <div class="form-check" v-for="answer in question.answers">
                 <label>
                   <input class="form-check-input" :name="index" :value="answer.pointer" type="radio" :disabled="showCorrectAnswers" v-model="question.givenAnswer">
@@ -318,5 +318,9 @@ a {
 .modal-wrapper {
   display: table-cell;
   vertical-align: middle;
+}
+
+.question-row{
+  background-color: lightgrey
 }
 </style>

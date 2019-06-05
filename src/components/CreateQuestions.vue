@@ -130,7 +130,7 @@
       chooseModule(moduleName){
         if (this.modules.find(c => c.moduleName === moduleName).isClicked) {
           for( let i = 0; i < this.modules.length; i++){ 
-            if ( this.modules[i] === moduleName) {
+            if ( this.modules[i].moduleName === moduleName) {
               this.modules.splice(i, 1); 
             }
           }

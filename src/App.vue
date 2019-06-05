@@ -10,7 +10,7 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-              <a class="nav-link" href="#" v-bind:class= "{disabled : !user}" >Quick Test</a>
+              <a class="nav-link" href="#" v-bind:class= "{disabled : !user}" @click="quickTestFunction">Quick Test</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#" v-bind:class= "{disabled : !user}" @click="loadTestFunction">Load Test</a>
@@ -32,7 +32,8 @@
           <createQuestions  v-if="user && components.createQuestions" v-bind:user="user" @createQuestions= "showTable" ref="createQuestions"/>
           <showTable  v-if="user && components.showTable" v-bind:user="user" v-bind:allRows="allRows" v-bind:testName="testName" v-bind:modules="modules" @refresh="clear"/>
           <loadTest  v-if="user && components.loadTest" v-bind:user="user" @gotQuestions="showTest"/>
-          <showTest  v-if="user && components.showTest" v-bind:user="user" v-bind:allQuestions="allQuestions" v-bind:testName="testName" v-bind:modules="modules" v-bind:testSettings="testSettings"/>
+          <showTest  v-if="user && components.showTest" v-bind:user="user" v-bind:allQuestions="allQuestions" v-bind:testName="testName" v-bind:modules="modules" v-bind:saveResults="saveResults" v-bind:testSettings="testSettings"/>
+          <quickTest v-if="user && components.quickTest"  v-bind:user="user" @gotQuestions="showTest"/>
         </div>
       </div>
     </main>
@@ -50,6 +51,7 @@ import CreateQuestions from './components/CreateQuestions'
 import ShowTable from './components/ShowTable'
 import ShowTest from './components/ShowTest'
 import LoadTest from './components/LoadTest'
+import QuickTest from './components/QuickTest'
 export default {
   name: "App",
   components: {
@@ -57,7 +59,8 @@ export default {
     CreateQuestions,
     ShowTable,
     LoadTest,
-    ShowTest
+    ShowTest,
+    QuickTest
   },
 
   data () {
@@ -74,7 +77,9 @@ export default {
       },
       testName: null,
       modules: [],
-      testSettings: null
+      testSettings: null,
+      
+      saveResults: false
     }
   },
   methods: {
@@ -86,13 +91,23 @@ export default {
       this.allRows= null
       this.allQuestions= []
       this.testSettings= null
+      this.saveResults= false
       this.components= {
         createQuestions: true,
         login: false,
         showTable: false,
         loadTest: false,
-        showTest: false
+        showTest: false,
+        quickTest: false
       }
+    },
+
+    clearTestInfo(){
+      this.testName = null
+      this.modules = []
+      this.allRows = null
+      this.testSettings= null
+      this.saveResults= false
     },
 
     getUser(value){
@@ -105,12 +120,10 @@ export default {
         login: false,
         showTable: false,
         loadTest: false,
-        showTest: false
+        showTest: false,
+        quickTest: false
       } 
-      this.testName = null
-      this.modules = []
-      this.allRows = null
-      this.testSettings= null
+      this.clearTestInfo()
     },
 
     loadTestFunction(){
@@ -119,15 +132,26 @@ export default {
         login: false,
         showTable: false,
         loadTest: true,
-        showTest: false
+        showTest: false,
+        quickTest: false
       } 
-      this.testName = null
-      this.modules = []
-      this.allRows = null
-      this.testSettings= null
+      this.clearTestInfo()
+    },
+
+    quickTestFunction(){
+      this.components = {
+        createQuestions: false,
+        login: false,
+        showTable: false,
+        loadTest: false,
+        showTest: false,
+        quickTest: true
+      } 
+      this.clearTestInfo()
     },
 
     showTable(value){
+      this.clearTestInfo()
       this.testName = value.test
       this.modules = value.modules
       this.allRows = value.rows
@@ -136,21 +160,25 @@ export default {
         login: false,
         showTable: true,
         loadTest: false,
-        showTest: false
+        showTest: false,
+        quickTest: false
       }
     },
 
     showTest(value){
+      this.clearTestInfo()
       this.testName = value.test
       this.modules = value.modules
       this.allQuestions = value.allQuestions
       this.testSettings = value.testSettings
+      this.saveResults = value.saveResults
       this.components = {
         createQuestions: false,
         login: false,
         showTable: false,
         loadTest: false,
-        showTest: true
+        showTest: true,
+        quickTest: false
       }
     }
 

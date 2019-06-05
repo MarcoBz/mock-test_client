@@ -20,7 +20,7 @@ import Test from './Test'
 import Results from './Results'
 export default {
   name: 'ShowTest',
-  props: ["user","allQuestions", "testName", "modules", "testSettings"],
+  props: ["user","allQuestions", "testName", "modules", "testSettings", "saveResults"],
   components: {
     Test,
     Results
