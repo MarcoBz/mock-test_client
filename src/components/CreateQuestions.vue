@@ -1,13 +1,12 @@
 <template>
   <div class="container-fluid align-middle">
     <div class="row">
-      <div class="col col-12">
-        <!-- <DragAndDrop v-bind:disabled= "pdfParsed" @changedFile="changedFileFunction"  @parsedCsv="passFileData"  @parsedPDF="parsedPDFFunction" @parsedJson="passJsonData" ref="dragAndDropComp"/> -->
-        <DragAndDrop @parsedPDF="parsedPDFFunction" @changedFile="clear" ref="dragAndDropComp"/>
+      <div class="col col-12"> 
+        <DragAndDrop @parsedPDF="parsedPDFFunction" @parsedJson="parsedJSONFunction" @changedFile="clear" ref="dragAndDropComp"/>
       </div>
     </div>
     <div class="row justify-content-md-center">
-      <div v-on:click="chooseTestName" class="col col-12" v-show="pdfParsed" ><button class="btn">Choose Test</button></div>
+      <div v-on:click="chooseTestName" class="col col-12" v-show="pdfParsed || jsonParsed" ><button class="btn">Choose Test</button></div>
     </div>
 
     <div v-if="showModal" >
@@ -40,7 +39,8 @@
                     <div class="container-fluid">
                       <div class="row justify-content-md-center">
                         <div class="col col-6">
-                          <button class="btn" v-on:click="createQuestions()">Create Questions</button>
+                          <button class="btn" v-on:click="createQuestions()" v-if="pdfParsed">Create Questions</button>
+                          <button class="btn" v-on:click="saveQuestions()" v-if="jsonParsed">Save Questions</button>
                         </div>
                         <div class="col col-6">
                           <button class="btn" v-on:click="clearTestName()">Clear</button>
@@ -69,8 +69,10 @@
     },
     data () {
       return {
-        allRows: null,
+        allRows: [],
+        allQuestions: [],
         pdfParsed: false,
+        jsonParsed: false,
         showModal: false,
         tests: [],
         modules: [],
@@ -80,10 +82,44 @@
     },
     methods: {
 
+      async saveQuestions(){
+        console.log(this.allQuestions)
+        let response
+        try{
+          let op = "add"
+          let path = "/questions"
+          let value = []
+          for (let i = 0; i < this.allQuestions.length; i++){
+            let answerArray = []
+            for (let j = 0; j < this.allQuestions[i].answers.length; j++) answerArray.push(this.allQuestions[i].answers[j].answer)
+            value.push({
+              question: this.allQuestions[i].question,
+              answers: answerArray,
+              correctAnswer: this.allQuestions[i].correctAnswer,
+              testName: this.chosenTestName,
+              modules: this.chosenModulesName
+            })
+          }
+          response = await userService.patchTest(this.user, this.chosenTestName, op, path, value)
+        }
+        catch (err){
+          response = err.response
+        }
+        finally {
+          if (response.data.content) {
+            this.$emit('refresh')  
+            this.showModal= false
+            document.getElementById('body').className = ''
+          }
+        }
+      },
+
       clearAll(){
         if(this.$refs.dragAndDropComp) this.$refs.dragAndDropComp.clear()
-        this.allRows = null
+        this.allRows = []
+        this.allQuestions = []
         this.pdfParsed= false
+        this.jsonParsed= false
         this.tests= []
         this.modules= []
         this.chosenTestName= null
@@ -92,8 +128,10 @@
       },
 
       clear(){
-        this.allRows = null
+        this.allRows = []
+        this.allQuestions = []
         this.pdfParsed= false
+        this.jsonParsed= false
         this.tests= []
         this.modules= []
         this.chosenTestName= null
@@ -143,8 +181,15 @@
       },
 
       parsedPDFFunction(value){
-        this.allRows = value
+        for (let i = 0; i < value.length; i++) this.allRows.push(value[i])
         this.pdfParsed = true
+        this.jsonParsed= false
+      },
+
+      parsedJSONFunction(value){
+        for (let i = 0; i < value.length; i++) this.allQuestions.push(value[i])
+        this.pdfParsed = false
+        this.jsonParsed= true
       },
 
       async chooseModuleName(){

@@ -98,8 +98,8 @@
         }
         else if (extension == "json"){
           parseJson.jsonParsing(this.files)
-          .then((allRows) => {
-            this.$emit('parsedJson', allRows)
+          .then((allQuestions) => {
+            this.$emit('parsedJson', allQuestions)
           })
         }
       }

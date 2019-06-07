@@ -29,7 +29,7 @@
       <div class= "row">
         <div class= "col col-md-12">
           <!-- <Login @logged="getUser" v-if="!user"/> -->
-          <createQuestions  v-if="user && components.createQuestions" v-bind:user="user" @createQuestions= "showTable" ref="createQuestions"/>
+          <createQuestions  v-if="user && components.createQuestions" v-bind:user="user" @createQuestions= "showTable" ref="createQuestions" @refresh="clear"/>
           <showTable  v-if="user && components.showTable" v-bind:user="user" v-bind:allRows="allRows" v-bind:testName="testName" v-bind:modules="modules" @refresh="clear"/>
           <loadTest  v-if="user && components.loadTest" v-bind:user="user" @gotQuestions="showTest"/>
           <showTest  v-if="user && components.showTest" v-bind:user="user" v-bind:allQuestions="allQuestions" v-bind:testName="testName" v-bind:modules="modules" v-bind:saveResults="saveResults" v-bind:testSettings="testSettings"/>
