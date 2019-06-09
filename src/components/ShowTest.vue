@@ -3,12 +3,12 @@
     <div id = "body-mocktest" class = "container" v-if="inputCreated">
       <div class="row">
         <div class="col">
-          <Test v-bind:allQuestions="allQuestions" v-bind:testSettings = "testSettings"  ref="Test" @updateResults="updateResults"/> 
+          <Test v-bind:allQuestions="allQuestions" v-bind:testSettings = "testSettings" v-bind:user="user" v-bind:testName="testName" v-bind:modules="modules" ref="Test" @updateResults="updateResults" @updateAvailableTests="updateAvailableTests"/> 
         </div>
       </div>
       <div class="row">
         <div class="col">
-          <Results v-if="showResults" v-bind:testSettings = "testSettings" v-bind:questions = "questions" ref="Results"/>
+          <Results v-if="showResults" v-bind:testSettings = "testSettings" v-bind:questions = "questions" v-bind:user="user" v-bind:testName="testName" v-bind:modules="modules"  ref="Results"/>
         </div>
       </div>
     </div>
@@ -44,6 +44,10 @@ export default {
   },
 
   methods: {
+    updateAvailableTests(value){
+      this.$emit('updateAvailableTests', value)
+    },
+
     updateResults(value){
       if (value.gotResults){
         this.showResults = true

@@ -76,9 +76,10 @@
 </template>
 
 <script>
+import userService from '../../services/userService'
 export default {
   name: 'Test',
-  props: ["allQuestions", "testSettings"],
+  props: ["allQuestions", "testSettings", "user", "testName", "modules"],
   data () {
     return {
       colorClass:[],
@@ -88,7 +89,6 @@ export default {
       numbersOfQuestions: this.testSettings.numbersOfQuestions,
       showResults: false,
       showModal: false,
-      test: null,
       showTest: false
     }
   },
@@ -159,7 +159,6 @@ export default {
     },
 
     getResults(){
-      // router.push({ name: 'Results', params: {questions: this. questions, numbersOfQuestions: this.numbersOfQuestions, correctAnswersPoints: this.correctAnswersPoints, noAnswersPoints: this.noAnswersPoints, wrongAnswersPoints: this.wrongAnswersPoints}})
       this.showCorrectAnswers = true
       for(let i = 0; i < this.questions.length; i++){
         if (!this.questions[i].givenAnswer) {
@@ -177,80 +176,128 @@ export default {
       this.$emit('updateResults', value)
     },
 
-    refresh(){
-      window.scrollTo(0,0)
-      this.clear()
-      this.numbersOfQuestions = this.testSettings.numbersOfQuestions
-      this.prepareQuestions()
-      this.getQuestions()
-      this.showTest= true
+    async refresh(){
+
+      let response
+      let op = "replace"
+      let path = "/availableTests"
+      let valuePatch = -1
+      try{
+        response = await userService.patchUser(this.user, op, path, valuePatch)
+      }
+      catch (err){
+        response = err.response
+      }
+      finally {
+        if (response.status === 200) {
+          this.$emit('updateAvailableTests', response.data.content.availableTests)
+          window.scrollTo(0,0)
+          this.clear()
+          this.numbersOfQuestions = this.testSettings.numbersOfQuestions
+          this.prepareQuestions()
+          this.getQuestions()
+          this.showTest= true
+        }
+      } 
+
     },
 
-    restart(){
-      window.scrollTo(0,0)
-      if (this.$refs.Results) this.$refs.Results.clear()
-      let value = {
+    async restart(){
 
-        questions: null,
-        gotResults: false
-
+      let response
+      let op = "replace"
+      let path = "/availableTests"
+      let valuePatch = -1
+      try{
+        response = await userService.patchUser(this.user, op, path, valuePatch)
       }
-      this.$emit('updateResults', value)
-      this.showCorrectAnswers = false,
-      this.colorClass = []
-
-      for (let i = 0; i < this.questions.length; i++){
-        this.questions[i].givenAnswer = null
+      catch (err){
+        response = err.response
       }
-      //this.showTest= false
-      this.showModal = true
-      this.text = "Restart same test - Would you like to shuffle the position of questions and answers?"
-    },
+      finally {
+        if (response.status === 200) {
+          this.$emit('updateAvailableTests', response.data.content.availableTests)
+          window.scrollTo(0,0)
+          if (this.$refs.Results) this.$refs.Results.clear()
+          let value = {
 
-    retry(){
-      window.scrollTo(0,0)
-      if (this.$refs.Results) this.$refs.Results.clear()
-      let value = {
+            questions: null,
+            gotResults: false
 
-        questions: null,
-        gotResults: false
-
-      }
-      this.$emit('updateResults', value)
-      this.showCorrectAnswers = false,
-      this.colorClass = []
-      let wrongQuestions = this.questions.filter((question) => {
-        return question.givenAnswer != question.correctAnswer || !question.givenAnswer
-      })
-
-      let wrongQuestionsArray = wrongQuestions.map((question) => {
-        return question.question
-      })
-
-      this.prepareQuestions()
-      this.shuffledQuestions = this.shuffledQuestions.filter((question) => {
-        return !wrongQuestionsArray.includes(question.question)
-      })
-      for (let i = 0; i < this.questions.length; i++){
-        if (this.questions[i].givenAnswer == this.questions[i].correctAnswer){
-          let chosenQuestion = this.shuffledQuestions.pop()
-          this.questions[i] = {
-            question: chosenQuestion.question,
-            answers: chosenQuestion.answers,
-            correctAnswer: chosenQuestion.correctAnswer,
-            givenAnswer: null,
-            correctAnswerText: chosenQuestion.answers.find( c => c.pointer === chosenQuestion.correctAnswer)
           }
+          this.$emit('updateResults', value)
+          this.showCorrectAnswers = false,
+          this.colorClass = []
+
+          for (let i = 0; i < this.questions.length; i++){
+            this.questions[i].givenAnswer = null
+          }
+          //this.showTest= false
+          this.showModal = true
+          this.text = "Restart same test - Would you like to shuffle the position of questions and answers?"
         }
-        else{
-          this.questions[i].givenAnswer = null
-        }
+      } 
+    },
+
+    async retry(){
+
+      let response
+      let op = "replace"
+      let path = "/availableTests"
+      let valuePatch = -1
+      try{
+        response = await userService.patchUser(this.user, op, path, valuePatch)
       }
-      wrongQuestions = null
-      wrongQuestionsArray = null
-      //this.showTest= false
-      this.showModal = true
-      this.text = "Retry wrong o no answered questions with other random questions - Would you like to shuffle the position of questions and answers?"
+      catch (err){
+        response = err.response
+      }
+      finally {
+        if (response.status === 200) {
+          window.scrollTo(0,0)
+          if (this.$refs.Results) this.$refs.Results.clear()
+          let value = {
+
+            questions: null,
+            gotResults: false
+
+          }
+          this.$emit('updateResults', value)
+          this.showCorrectAnswers = false,
+          this.colorClass = []
+          let wrongQuestions = this.questions.filter((question) => {
+            return question.givenAnswer != question.correctAnswer || !question.givenAnswer
+          })
+
+          let wrongQuestionsArray = wrongQuestions.map((question) => {
+            return question.question
+          })
+
+          this.prepareQuestions()
+          this.shuffledQuestions = this.shuffledQuestions.filter((question) => {
+            return !wrongQuestionsArray.includes(question.question)
+          })
+          for (let i = 0; i < this.questions.length; i++){
+            if (this.questions[i].givenAnswer == this.questions[i].correctAnswer){
+              let chosenQuestion = this.shuffledQuestions.pop()
+              this.questions[i] = {
+                question: chosenQuestion.question,
+                answers: chosenQuestion.answers,
+                correctAnswer: chosenQuestion.correctAnswer,
+                givenAnswer: null,
+                correctAnswerText: chosenQuestion.answers.find( c => c.pointer === chosenQuestion.correctAnswer)
+              }
+            }
+            else{
+              this.questions[i].givenAnswer = null
+            }
+          }
+          wrongQuestions = null
+          wrongQuestionsArray = null
+          //this.showTest= false
+          this.showModal = true
+          this.text = "Retry wrong o no answered questions with other random questions - Would you like to shuffle the position of questions and answers?"
+        }
+      } 
     },
 
     shufflePosition(){

@@ -1,11 +1,13 @@
 <template>
   <div class="container-fluid align-middle">
       <div class = "row">
-        <div class = "col col-sm-6 text-center">
-          <input  id="userName" v-model="user"  placeholder="User Name" v-bind:class="{ 'border border-danger' :userError}" v-on:keydown="deleteBorder()">
+        <div class = "col text-center">
+          <h1>STATISTICS</h1>
         </div>
-        <div class = "col col-sm-6 text-left">
-         <button class = "btn" v-on:click="getUser()">Login</button>
+      </div>
+      <div class = "row">
+        <div class = "col text-center">
+          [Work in progress]
         </div>
       </div>
   </div>
@@ -34,11 +36,7 @@
         finally {
           if (response.data.content) {
               this.userExist = true
-              let value = {
-                user: this.user,
-                availableTests: response.data.content.availableTests
-              }
-              this.$emit('logged', value)
+              this.$emit('logged', this.user)
             }
           else {
             this.user = null

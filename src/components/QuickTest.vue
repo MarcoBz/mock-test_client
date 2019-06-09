@@ -1,17 +1,20 @@
 <template>
   <div id = "quicktest">
     <div class="container-fluid align-middle">
-        <div class="row justify-content-md-center">
+        <div class="row text text-center">
           <div class="col"><input v-model="testSettings.numbersOfQuestions" type="text" placeholder="Number of questions" ></div>
         </div> 
-        <div class="row justify-content-md-center">
+        <div class="row text text-center">
           <div class="col"><input v-model="testSettings.correctAnswersPoints" type="text" placeholder="Points correct answer" ></div>
         </div>
-        <div class="row justify-content-md-center">
+        <div class="row text text-center">
           <div class="col"><input v-model="testSettings.wrongAnswersPoints" type="text" placeholder="Points wrong answer" ></div>
         </div>
-        <div class="row justify-content-md-center">
+        <div class="row text text-center">
           <div class="col"><input v-model="testSettings.noAnswersPoints" type="text" placeholder="Points no answer" ></div>
+        </div>
+        <div class="row text text-center">
+          <div class="col"><input v-model="testSettings.timeForTest" type="text" placeholder="Minutes for test" ></div>
         </div>
     </div>
     <div class = "row">
@@ -152,7 +155,7 @@
           this.showCreateTestButton= false
         }
         else{
-        let response
+          let response
           try{
             response = await (userService.getTest(this.user))
           }
@@ -211,6 +214,7 @@
               if(this.$refs.dragAndDropComp) this.$refs.dragAndDropComp.clear()
               this.isLoadButtonClicked = true
               this.showCreateTestButton = true
+              this.showModal = false
             }
           }
         
@@ -234,9 +238,8 @@
 
       chooseModule(moduleName){
         if (this.modules.find(c => c.moduleName === moduleName).isClicked) {
-          for( let i = 0; i < this.modules.length; i++){ 
-
-            if ( this.modules[i].moduleName === moduleName) {
+          for( let i = 0; i < this.chosenModulesName.length; i++){ 
+            if ( this.chosenModulesName[i] === moduleName) {
               this.chosenModulesName.splice(i, 1); 
             }
           }
@@ -258,4 +261,32 @@
   .margin-btn{
     margin: 10px
   }
+
+  .modal-mask {
+    position: fixed;
+    z-index: 9998;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .5);
+    display: table;
+    transition: opacity .3s ease;
+  }
+
+  .modal-open {
+      overflow-y: hidden;
+  }
+
+  .modal-wrapper {
+    display: table-cell;
+    vertical-align: middle;
+  }
+
+  .modal-body {
+    margin: 20px 0;
+    max-height: 800px;
+    overflow-y: auto;
+  }
+
 </style>

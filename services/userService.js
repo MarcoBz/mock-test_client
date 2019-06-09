@@ -1,8 +1,9 @@
 import Api from "./Api"
 
-export function postUser (userName) {
+export function postUser (userName,availableTests) {
   let body = {
-    userName : userName
+    userName : userName,
+    availableTests: availableTests
   }
   const route = "user/" 
   return Api().post(route, body)
@@ -11,6 +12,17 @@ export function postUser (userName) {
 export function getUser (userName) {
   const route = "user/" + userName
   return Api().get(route)
+}
+
+export function patchUser (userName, op, path, value){
+  let body = {
+    op : op,
+    path : path
+  }
+
+  if (value) body.value = value
+  const route = "user/" + userName 
+  return Api().patch(route, body)
 }
 
 export function postTest (userName, testName, testSettings, modules) {
@@ -25,24 +37,23 @@ export function postTest (userName, testName, testSettings, modules) {
 
 export function getTest (userName, testName, property){
 
-  const route
+  let route
 
   if (testName){
-    if (property) route = "user/" + userName + "/test/?=testName" + testName.split(' ').join('+') + "&property=" + property.split(' ').join('+') 
-    else route = "user/" + userName + "/test/?=testName" + testName.split(' ').join('+')
+    if (property) route = "user/" + userName + "/test/?testName=" + testName.split(' ').join('+') + "&property=" + property.split(' ').join('+') 
+    else route = "user/" + userName + "/test/?testName=" + testName.split(' ').join('+')
   }
 
   else route = "user/" + userName + "/test/"
   return Api().get(route)
 }
 
-export function postResult (userName, testName, date, moduleName, testPoints, results){
+export function postResult (userName, testName, moduleName, testPoints, results){
   let body = {
     testName : testName,
     testPoints : testPoints,
     moduleName : moduleName,
-    results: results,
-    date: date
+    results: results
   }
   const route = "user/" + userName + "/result/"
   return Api().post(route, body)
@@ -50,24 +61,22 @@ export function postResult (userName, testName, date, moduleName, testPoints, re
 
 export function getResult (userName, testName){
 
-  const route
+  let route
 
-  if (testName) route = "user/" + userName + "/result/?=testName"
+  if (testName) route = "user/" + userName + "/result/?testName=" + testName.split(' ').join('+')
   else route = "user/" + userName + "/result/"
 
   return Api().get(route)
 }
 
 export function patchTest (userName, testName, op, path, value){
-
   let body = {
     op : op,
     path : path
   }
 
   if (value) body.value = value
-  const route = "user/" + userName + "/test/?=testName"
-
+  const route = "user/" + userName + "/test/?testName=" + testName.split(' ').join('+')
   return Api().patch(route, body)
 }
 
@@ -78,5 +87,6 @@ export default {
   postTest,
   getResult,
   postResult,
-  patchTest
+  patchTest,
+  patchUser
 }

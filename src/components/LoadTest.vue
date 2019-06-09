@@ -7,7 +7,9 @@
           </div>
           <div class = "col col-md-4 text-center">
             <div v-if="showTestDetails">
-              <button v-for="moduleObj in modules" class="btn" v-on:click="chooseModule(moduleObj.moduleName)" v-bind:class="{'btn-success' : moduleObj.isClicked}" > {{moduleObj.moduleName}}</button> 
+              <div v-for="moduleObj in modules"> 
+                <button class="btn" v-on:click="chooseModule(moduleObj.moduleName)" v-bind:class="{'btn-success' : moduleObj.isClicked}" > {{moduleObj.moduleName}}</button> 
+              </div>
             </div>
           </div>
           <div class = "col col-md-4 text-center" >
@@ -16,6 +18,8 @@
               <div class = "row">Points for correct answer: {{testSettings.correctAnswersPoints}}</div>
               <div class = "row">Points for wrong answer : {{testSettings.wrongAnswersPoints}}</div>
               <div class = "row">Points for no answer : {{testSettings.noAnswersPoints}}</div>
+              <div class = "row">Number of Answers : {{testSettings.numbersOfAnswers}}</div>
+              <div class = "row">Minutes for test : {{testSettings.timeForTest}}</div>
             </div>
           </div>
         </div>
@@ -59,6 +63,8 @@
           correctAnswersPoints: null,
           wrongAnswersPoints: null,
           noAnswersPoints: null,
+          numbersOfAnswers: null,
+          timeForTest: null
         },
         showTestDetails: false,
         chosenTestName: null,
@@ -110,6 +116,7 @@
 
       parsedJSONFunction(value){
         for (let i = 0; i < value.length; i++) this.allQuestions.push(value[i])
+        console.log(this.allQuestions)
         this.showCreateTestButton= true
         this.isLoadButtonClicked= false
       },
@@ -181,7 +188,9 @@
                 numbersOfQuestions: response.data.content.numbersOfQuestions,
                 correctAnswersPoints: response.data.content.correctAnswersPoints,
                 wrongAnswersPoints: response.data.content.wrongAnswersPoints,
-                noAnswersPoints: response.data.content.noAnswersPoints
+                noAnswersPoints: response.data.content.noAnswersPoints,
+                numbersOfAnswers: response.data.content.numbersOfAnswers,
+                timeForTest: response.data.content.timeForTest
               }
           }
         }  
@@ -189,9 +198,8 @@
 
       chooseModule(moduleName){
         if (this.modules.find(c => c.moduleName === moduleName).isClicked) {
-          for( let i = 0; i < this.modules.length; i++){ 
-
-            if ( this.modules[i].moduleName === moduleName) {
+          for( let i = 0; i < this.chosenModulesName.length; i++){ 
+            if ( this.chosenModulesName[i] === moduleName) {
               this.chosenModulesName.splice(i, 1); 
             }
           }
@@ -201,7 +209,6 @@
           this.modules.find(c => c.moduleName === moduleName).isClicked = true
           this.chosenModulesName.push(moduleName)
         }
-
         if (this.chosenModulesName.length > 0) this.showGetQuestions = true
         else {
           this.showGetQuestions = false

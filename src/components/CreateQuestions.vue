@@ -77,13 +77,12 @@
         tests: [],
         modules: [],
         chosenTestName: null,
-        chosenModulesName: ['general']
+        chosenModulesName: ['General']
       }
     },
     methods: {
 
       async saveQuestions(){
-        console.log(this.allQuestions)
         let response
         try{
           let op = "add"
@@ -91,7 +90,7 @@
           let value = []
           for (let i = 0; i < this.allQuestions.length; i++){
             let answerArray = []
-            for (let j = 0; j < this.allQuestions[i].answers.length; j++) answerArray.push(this.allQuestions[i].answers[j].answer)
+            for (let j = 0; j < this.allQuestions[i].answers.length; j++) answerArray.push(this.allQuestions[i].answers[j])
             value.push({
               question: this.allQuestions[i].question,
               answers: answerArray,
@@ -123,7 +122,7 @@
         this.tests= []
         this.modules= []
         this.chosenTestName= null
-        this.chosenModulesName= ['general']
+        this.chosenModulesName= ['General']
 
       },
 
@@ -135,7 +134,7 @@
         this.tests= []
         this.modules= []
         this.chosenTestName= null
-        this.chosenModulesName= ['general']
+        this.chosenModulesName= ['General']
       },
 
       createQuestions(){
@@ -167,9 +166,9 @@
 
       chooseModule(moduleName){
         if (this.modules.find(c => c.moduleName === moduleName).isClicked) {
-          for( let i = 0; i < this.modules.length; i++){ 
-            if ( this.modules[i].moduleName === moduleName) {
-              this.modules.splice(i, 1); 
+          for( let i = 0; i < this.chosenModulesName.length; i++){ 
+            if ( this.chosenModulesName[i] === moduleName) {
+              this.chosenModulesName.splice(i, 1); 
             }
           }
           this.modules.find(c => c.moduleName === moduleName).isClicked = false
@@ -204,7 +203,7 @@
           if (response.data.content) {
             for (let i = 0; i < response.data.content.length; i++){
 
-              if (response.data.content[i].moduleName != "general") this.modules.push({
+              if (response.data.content[i].moduleName != "General") this.modules.push({
                 moduleName: response.data.content[i].moduleName,
                 createdDate: response.data.content[i].createdDate,
                 isClicked: false

@@ -30,10 +30,10 @@
 </template>
 
 <script>
-import router from '../router'
+import userService from '../../services/userService'
 export default {
   name: 'Results',
-  props: ["questions", "testSettings"],
+  props: ["questions", "testSettings", "user", "testName", "modules"],
   data () {
     return {
       numbersOfQuestions: this.testSettings.numbersOfQuestions,
@@ -43,12 +43,12 @@ export default {
       correctAnswers: 0,
       wrongAnswers: 0,
       noAnswers: 0,
-      totalPoints: 0
+      totalPoints: 0,
+      showResults: false
     }
   },
 
-  mounted(){
-    
+  async mounted(){
     if (this.questions) {
       for (let i = 0; i < this.questions.length; i++){
         if (!this.questions[i].givenAnswer) this.noAnswers++
@@ -56,6 +56,25 @@ export default {
         else this.wrongAnswers++
       }
       this.totalPoints = this.correctAnswers * this.correctAnswersPoints + this.wrongAnswers * this.wrongAnswersPoints + this.noAnswers * this.noAnswersPoints
+      let response
+      let results = {
+        numbersOfQuestions: this.numbersOfQuestions,
+        correctAnswersPoints: this.correctAnswersPoints,
+        noAnswersPoints: this.noAnswersPoints,
+        wrongAnswersPoints: this.wrongAnswersPoints,        
+      } 
+      // try{
+      //   response = await userService.postResult(this.user, this.testName, this.modules, this.totalPoints, results)
+      // }
+      // catch (err){
+      //   response = err.response
+      // }
+      // finally {
+      //   if (response.status === 201) {
+      //     this.showResults = true
+      //   }
+      // }
+      this.showResults = true
     }
 
   },
@@ -70,6 +89,7 @@ export default {
       this.wrongAnswers= 0
       this.noAnswers= 0
       this.totalPoints= 0
+      this.showResults = false
     }
   }
 }

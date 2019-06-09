@@ -77,33 +77,6 @@
         </div>
       </transition>
     </div>
-    <div v-if="showNumberModal" >
-      <transition name="modal">
-        <div class="modal-mask">
-          <div class="modal-wrapper">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-body">
-                    <div class="container-fluid">
-                      <div class="row justify-content-md-center">
-                        <div class="col">
-                          Number of answers per question
-                        </div>
-                      </div>
-                      <div class="row justify-content-md-center">
-                        <div class="col"><input v-model="numberOfAnswers" type="text" placeholder="0" ></div>
-                      </div>
-                      <div class="row justify-content-md-center">
-                        <button type="button" class="btn" @click="goToCreateQuestions"> OK </button>
-                      </div>
-                    </div> 
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </transition>
-    </div>
   </div>
 </template>
 
@@ -118,15 +91,10 @@ export default {
       questions: [],
       pointersArray: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
       showModal: false,
-      numberOfAnswers: 0,
-      showNumberModal: false,
+      numberOfAnswers: this.testSettings.numberOfAnswers,
       currentPointersArray: null,
       checkAllCorrectAnswers: false
     }
-  },
-
-  created(){
-    this.showNumberModal = true
   },
 
   mounted(){
@@ -134,6 +102,8 @@ export default {
       // this.$emit('refresh')
     }
     else {    
+      
+      this.currentPointersArray = this.pointersArray.slice(0, this.numberOfAnswers)
       for (let i = 0; i < this.allRows.length; i++){
         this.rows.push({
           str: this.allRows[i],
@@ -151,11 +121,6 @@ export default {
 
 
   methods: {
-
-    goToCreateQuestions(){
-     this.showNumberModal = false
-     this.currentPointersArray = this.pointersArray.slice(0, this.numberOfAnswers)
-    },
 
     joinAnswers(answersArray){
       let joinedAnswersArray = []
@@ -258,7 +223,10 @@ export default {
           let value = []
           for (let i = 0; i < this.questions.length; i++){
             let answerArray = []
-            for (let j = 0; j < this.questions[i].answers.length; j++) answerArray.push(this.questions[i].answers[j].str)
+            for (let j = 0; j < this.questions[i].answers.length; j++) answerArray.push({
+              answer: this.questions[i].answers[j].str,
+              pointer: this.questions[i].answers[j].pointer
+            })
             value.push({
               question: this.questions[i].question,
               answers: answerArray,
