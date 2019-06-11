@@ -3,23 +3,42 @@
     <div class="container-fluid align-middle">
         <div class = "row" v-if="show">
           <div class = "col col-md-4 text-center">
-            <button class="btn margin-btn" v-on:click="chooseTest(test.testName)"  v-bind:class="{'btn-success' : test.isClicked}" v-for="test in tests"> {{test.testName}}</button>
+            <div class = "row" >
+              <div class = "col">
+                <h3 class = "text text-center"> Tests Name</h3>
+              </div>
+            </div>
+            <div class = "row" v-for="test in tests">
+              <div class = "col">
+                <button class="btn margin-btn" v-on:click="chooseTest(test.testName)"  v-bind:class="{'btn-success' : test.isClicked}"> {{test.testName}}</button>
+              </div>
+            </div>
           </div>
           <div class = "col col-md-4 text-center">
-            <div v-if="showTestDetails">
-              <div v-for="moduleObj in modules"> 
-                <button class="btn" v-on:click="chooseModule(moduleObj.moduleName)" v-bind:class="{'btn-success' : moduleObj.isClicked}" > {{moduleObj.moduleName}}</button> 
+            <div class = "row" >
+              <div class = "col">
+                <h3 class = "text text-center"> Modules Name</h3>
+              </div>
+            </div>
+            <div class = "row" v-for="moduleObj in modules">
+              <div class = "col">
+                <button class="btn margin-btn" v-on:click="chooseModule(moduleObj.moduleName)" v-bind:class="{'btn-success' : moduleObj.isClicked}" v-if="showTestDetails" > {{moduleObj.moduleName}}</button> 
               </div>
             </div>
           </div>
           <div class = "col col-md-4 text-center" >
+            <div class = "row" >
+              <div class = "col">
+                <h3 class = "text text-left"> Test Settings</h3>
+              </div>
+            </div>
             <div v-if="showTestDetails">
-              <div class = "row">Number of questions : {{testSettings.numbersOfQuestions}}</div>
-              <div class = "row">Points for correct answer: {{testSettings.correctAnswersPoints}}</div>
-              <div class = "row">Points for wrong answer : {{testSettings.wrongAnswersPoints}}</div>
-              <div class = "row">Points for no answer : {{testSettings.noAnswersPoints}}</div>
-              <div class = "row">Number of Answers : {{testSettings.numbersOfAnswers}}</div>
-              <div class = "row">Minutes for test : {{testSettings.timeForTest}}</div>
+              <div class = "row"><div class = "col">Number of questions : {{testSettings.numbersOfQuestions}}</div></div>
+              <div class = "row"><div class = "col">Points for correct answer: {{testSettings.correctAnswersPoints}}</div></div>
+              <div class = "row"><div class = "col">Points for wrong answer : {{testSettings.wrongAnswersPoints}}</div></div>
+              <div class = "row"><div class = "col">Points for no answer : {{testSettings.noAnswersPoints}}</div></div>
+              <div class = "row"><div class = "col">Number of Answers : {{testSettings.numbersOfAnswers}}</div></div>
+              <div class = "row"><div class = "col">Minutes for test : {{testSettings.timeForTest}}</div></div>
             </div>
           </div>
         </div>
@@ -93,6 +112,7 @@
               isClicked: false
             })
             this.show = true
+            this.tests.sort(this.date_sort)
           }
         }
       }
@@ -116,7 +136,6 @@
 
       parsedJSONFunction(value){
         for (let i = 0; i < value.length; i++) this.allQuestions.push(value[i])
-        console.log(this.allQuestions)
         this.showCreateTestButton= true
         this.isLoadButtonClicked= false
       },
@@ -206,6 +225,18 @@
           this.modules.find(c => c.moduleName === moduleName).isClicked = false
         }
         else {
+          if (moduleName === "General"){
+            this.chosenModulesName = []
+            for( let i = 0; i < this.modules.length; i++) this.modules[i].isClicked = false
+          }
+          else if (this.chosenModulesName.find(c => c === "General")){
+            this.modules.find(c => c.moduleName === "General").isClicked = false
+            for( let i = 0; i < this.chosenModulesName.length; i++){ 
+              if ( this.chosenModulesName[i].moduleName === 'General') {
+                this.chosenModulesName.splice(i, 1); 
+              }
+            }            
+          }
           this.modules.find(c => c.moduleName === moduleName).isClicked = true
           this.chosenModulesName.push(moduleName)
         }
@@ -217,7 +248,11 @@
 
       },
 
-      async chooseModuleName(){
+      date_sort(a, b) {
+        return new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime();
+      },
+
+      async chooseModuleName(){ //scegliere o general oppure quanti moduli si vuole, anche nel quickTest
         let response
         try{
           response = await (userService.getTest(this.user, this.chosenTestName, "modules"))
@@ -233,6 +268,17 @@
                 createdDate: response.data.content[i].createdDate,
                 isClicked: false
               })
+            }
+            this.modules.sort(this.date_sort)
+            if (this.modules[0].moduleName != 'General'){
+              let generalModule
+              for( let i = 0; i < this.modules.length; i++){ 
+                if ( this.modules[i].moduleName === 'General') {
+                    generalModule = this.modules[i]
+                  this.modules.splice(i, 1); 
+                }
+              }
+              this.modules.unshift(generalModule)
             }
           }
         }        

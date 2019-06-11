@@ -44,16 +44,26 @@
                     <div class="container-fluid">
                       <div class="row justify-content-md-center">
                         <div class="col col-6">
+                          <div class = "row" >
+                            <div class = "col">
+                              <h3 class = "text text-center"> Tests Name</h3>
+                            </div>
+                          </div>
                           <div class="row justify-content-md-center" v-for="test in tests">
                             <div class="col">
-                              <button class="btn" v-on:click="chooseTest(test.testName)"  v-bind:class="{'btn-success' : test.isClicked}"> {{test.testName}}</button>
+                              <button class="btn margin-btn" v-on:click="chooseTest(test.testName)"  v-bind:class="{'btn-success' : test.isClicked}"> {{test.testName}}</button>
                             </div>
                           </div>
                         </div>
                         <div class="col col-6">
+                          <div class = "row" >
+                            <div class = "col">
+                              <h3 class = "text text-center"> Modules Name</h3>
+                            </div>
+                          </div>
                           <div class="row justify-content-md-center" v-for="moduleObj in modules">
                             <div class="col">
-                              <button v-if="moduleObj.moduleName" class="btn" v-on:click="chooseModule(moduleObj.moduleName)" v-bind:class="{'btn-success' : moduleObj.isClicked}"> {{moduleObj.moduleName}}</button>
+                              <button v-if="moduleObj.moduleName" class="btn margin-btn" v-on:click="chooseModule(moduleObj.moduleName)" v-bind:class="{'btn-success' : moduleObj.isClicked}"> {{moduleObj.moduleName}}</button>
                             </div>
                           </div>
                         </div>
@@ -173,10 +183,15 @@
                   isClicked: false
                 })
               }
+              this.tests.sort(this.date_sort)
             }
           }
         }     
 
+      },
+
+      date_sort(a, b) {
+        return new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime();
       },
 
       async chooseModuleName(){
@@ -195,6 +210,17 @@
                 createdDate: response.data.content[i].createdDate,
                 isClicked: false
               })
+            }            
+            this.modules.sort(this.date_sort)
+            if (this.modules[0].moduleName != 'General'){
+              let generalModule
+              for( let i = 0; i < this.modules.length; i++){ 
+                if ( this.modules[i].moduleName === 'General') {
+                    generalModule = this.modules[i]
+                  this.modules.splice(i, 1); 
+                }
+              }
+              this.modules.unshift(generalModule)
             }
           }
         }        
@@ -246,6 +272,18 @@
           this.modules.find(c => c.moduleName === moduleName).isClicked = false
         }
         else {
+          if (moduleName === "General"){
+            this.chosenModulesName = []
+            for( let i = 0; i < this.modules.length; i++) this.modules[i].isClicked = false
+          }
+          else if (this.chosenModulesName.find(c => c === "General")){
+            this.modules.find(c => c.moduleName === "General").isClicked = false
+            for( let i = 0; i < this.chosenModulesName.length; i++){ 
+              if ( this.chosenModulesName[i].moduleName === 'General') {
+                this.chosenModulesName.splice(i, 1); 
+              }
+            }            
+          }
           this.modules.find(c => c.moduleName === moduleName).isClicked = true
           this.chosenModulesName.push(moduleName)
         }
@@ -287,6 +325,10 @@
     margin: 20px 0;
     max-height: 800px;
     overflow-y: auto;
+  }
+
+  .margin-btn{
+    margin: 10px
   }
 
 </style>

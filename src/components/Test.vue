@@ -148,6 +148,7 @@ export default {
     getQuestions(){
       for ( let i = 0; i < this.numbersOfQuestions; i++){
         let chosenQuestion = this.shuffledQuestions.pop()
+        console.log(i, this.questions)
         this.questions.push({
           question: chosenQuestion.question,
           answers: chosenQuestion.answers,

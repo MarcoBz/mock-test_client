@@ -19,16 +19,26 @@
                     <div class="container-fluid">
                       <div class="row justify-content-md-center">
                         <div class="col col-6">
+                          <div class = "row" >
+                            <div class = "col">
+                              <h3 class = "text text-center"> Tests Name</h3>
+                            </div>
+                          </div>
                           <div class="row justify-content-md-center" v-for="test in tests">
                             <div class="col">
-                              <button class="btn" v-on:click="chooseTest(test.testName)"  v-bind:class="{'btn-success' : test.isClicked}"> {{test.testName}}</button>
+                              <button class="btn margin-btn" v-on:click="chooseTest(test.testName)"  v-bind:class="{'btn-success' : test.isClicked}"> {{test.testName}}</button>
                             </div>
                           </div>
                         </div>
                         <div class="col col-6">
+                          <div class = "row" >
+                            <div class = "col">
+                              <h3 class = "text text-center"> Modules Name</h3>
+                            </div>
+                          </div>
                           <div class="row justify-content-md-center" v-for="moduleObj in modules">
                             <div class="col">
-                              <button v-if="moduleObj.moduleName" class="btn" v-on:click="chooseModule(moduleObj.moduleName)" v-bind:class="{'btn-success' : moduleObj.isClicked}"> {{moduleObj.moduleName}}</button>
+                              <button v-if="moduleObj.moduleName" class="btn margin-btn" v-on:click="chooseModule(moduleObj.moduleName)" v-bind:disabled="moduleObj.moduleName === 'General'" v-bind:class="{'btn-success' : moduleObj.isClicked}"> {{moduleObj.moduleName}}</button>
                             </div>
                           </div>
                         </div>
@@ -77,7 +87,7 @@
         tests: [],
         modules: [],
         chosenTestName: null,
-        chosenModulesName: ['General']
+        chosenModulesName: []
       }
     },
     methods: {
@@ -122,7 +132,7 @@
         this.tests= []
         this.modules= []
         this.chosenTestName= null
-        this.chosenModulesName= ['General']
+        this.chosenModulesName= []
 
       },
 
@@ -134,7 +144,7 @@
         this.tests= []
         this.modules= []
         this.chosenTestName= null
-        this.chosenModulesName= ['General']
+        this.chosenModulesName= []
       },
 
       createQuestions(){
@@ -191,6 +201,10 @@
         this.jsonParsed= true
       },
 
+      date_sort(a, b) {
+        return new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime();
+      },
+
       async chooseModuleName(){
         let response
         try{
@@ -208,6 +222,24 @@
                 createdDate: response.data.content[i].createdDate,
                 isClicked: false
               })
+
+              else this.modules.push({
+                moduleName: response.data.content[i].moduleName,
+                createdDate: response.data.content[i].createdDate,
+                isClicked: true
+              })
+
+            }
+            this.modules.sort(this.date_sort)
+            if (this.modules[0].moduleName != 'General'){
+              let generalModule
+              for( let i = 0; i < this.modules.length; i++){ 
+                if ( this.modules[i].moduleName === 'General') {
+                    generalModule = this.modules[i]
+                  this.modules.splice(i, 1); 
+                }
+              }
+              this.modules.unshift(generalModule)
             }
           }
         }        
@@ -227,10 +259,11 @@
             for (let i = 0; i < response.data.content.length; i++){
               this.tests.push({
                 testName: response.data.content[i].testName,
-                createdDate: response.data.content[i].createdDate,
+                createdDate: response.data.content[i].createdDate,//modificare in lastTestDate
                 isClicked: false
               })
             }
+            this.tests.sort(this.date_sort)
           }
         }
       }
@@ -267,4 +300,10 @@
   max-height: 800px;
   overflow-y: auto;
 }
+
+.margin-btn{
+  margin: 10px
+}
+
+
 </style>
