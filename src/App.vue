@@ -31,9 +31,10 @@
         </div> -->
       </nav>
     </header>
-    <main role="main" class="container main">
+    <main role="main" class="container-fluid main">
       <div class= "row">
-        <div class= "col col-md-12">
+
+        <div class= "col">
           <Login @logged="gotUser" v-if="!user"/>
           <statistics v-if="user && components.statistics" v-bind:user="user"/>
           <createQuestions  v-if="user && components.createQuestions" v-bind:user="user" @createQuestions= "showTable" ref="createQuestions" @refresh="clear"/>
@@ -43,6 +44,27 @@
           <quickTest v-if="user && components.quickTest"  v-bind:user="user" @gotQuestions="showTest"/>
           <saveTest  v-if="user && components.saveTest" v-bind:user="user" @refresh="clear"/>
         </div>
+          <!-- <circular-count-down-timer
+            :initial-value="timeInSeconds"
+            :stroke-width="5"
+            :seconds-stroke-color="'#f00'"
+            :minutes-stroke-color="'#0ff'"
+            :hours-stroke-color="'#0f0'"
+            :underneath-stroke-color="'lightgrey'"
+            :seconds-fill-color="'#00ffff66'"
+            :minutes-fill-color="'#00ff0066'"
+            :hours-fill-color="'#ff000066'"
+            :size="100"
+            :padding="4"
+            :second-label="timeLabel"
+            :show-second="true"
+            :show-minute="showMinutes"
+            :show-hour="false"
+            :show-negatives="true"
+            :paused="some_variable"
+            :notify-every="'minute'"
+            @update="updated">
+          </circular-count-down-timer> -->
       </div>
     </main>
     <footer class="fixed-bottom">
@@ -78,6 +100,9 @@ export default {
 
   data () {
     return {
+      time: 2,
+      timeInSeconds: 0,
+      timeLabel: "minutes",
       availableTests: null,
       user: null,
       allRows: null,
@@ -97,8 +122,14 @@ export default {
       saveResults: false
     }
   },
-  methods: {
 
+  methods: {
+    updated: (status) => {
+        console.log(status);    //{"value": 144, "seconds": 24, "minutes": 2, "hours": 0}
+        if (status.value < 60) {
+          this.timeLabel= "seconds"
+        }
+    },
     updateAvailableTests(value){
       this.availableTests = value
     },

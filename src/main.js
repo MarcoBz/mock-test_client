@@ -4,6 +4,8 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import DragAndDrop from './components/DragAndDrop'
+import CircularCountDownTimer from "vue-circular-count-down-timer";
+Vue.use(CircularCountDownTimer);
 
 Vue.config.productionTip = false
 
