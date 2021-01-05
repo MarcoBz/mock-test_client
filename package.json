@@ -10,7 +10,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "papaparse": "^4.6.3",
     "pdfjs-dist": "^2.0.943",
     "vue": "^2.5.2",
